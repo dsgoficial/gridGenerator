@@ -33,9 +33,9 @@ class GridAndLabelCreator(object):
 		if (t == 1 and u == 0) or (t == UTM_num_x and u == 0):
 			
 			#Symbol vertices
-			v1 = QgsPoint(((floor(xmin_UTM/grid_spacing)+t)*grid_spacing),((floor(ymin_UTM/grid_spacing)+1)*grid_spacing))
+			v1 = QgsPoint(((floor(xmin_UTM/grid_spacing)+t)*grid_spacing), ymin_UTM)
 			v1.transform(trUTMLL)
-			v2 = QgsPoint(((floor(xmin_UTM/grid_spacing)+t)*grid_spacing),((floor(ymax_UTM/grid_spacing)+1)*grid_spacing))
+			v2 = QgsPoint(((floor(xmin_UTM/grid_spacing)+t)*grid_spacing), ymax_UTM)
 			v2.transform(trUTMLL)
 			
 			#0: left bound; 1: right bound
@@ -61,9 +61,9 @@ class GridAndLabelCreator(object):
 		elif (u == 1 and t == 0) or (u == UTM_num_y and t == 0):
 			
 			#Symbol vertices
-			h1 = QgsPoint(((floor(xmin_UTM/grid_spacing)+1)*grid_spacing),((floor(ymin_UTM/grid_spacing)+u)*grid_spacing))
+			h1 = QgsPoint(xmin_UTM,((floor(ymin_UTM/grid_spacing)+u)*grid_spacing))
 			h1.transform(trUTMLL)
-			h2 = QgsPoint(((floor(xmax_UTM/grid_spacing)+1)*grid_spacing),((floor(ymin_UTM/grid_spacing)+u)*grid_spacing))
+			h2 = QgsPoint(xmax_UTM,((floor(ymin_UTM/grid_spacing)+u)*grid_spacing))
 			h2.transform(trUTMLL)
 			
 			#0: bottom bound; 1: upper bound
@@ -89,17 +89,17 @@ class GridAndLabelCreator(object):
 		
 		#Vertical
 		elif (not(t == 1)) and (not(t == UTM_num_x)) and u == 0:
-			v1 = QgsPoint(((floor(xmin_UTM/grid_spacing)+t)*grid_spacing),((floor(ymin_UTM/grid_spacing)+1)*grid_spacing))
+			v1 = QgsPoint(((floor(xmin_UTM/grid_spacing)+t)*grid_spacing), ymin_UTM)
 			v1.transform(trUTMLL)
-			v2 = QgsPoint(((floor(xmin_UTM/grid_spacing)+t)*grid_spacing),((floor(ymax_UTM/grid_spacing)+1)*grid_spacing))
+			v2 = QgsPoint(((floor(xmin_UTM/grid_spacing)+t)*grid_spacing), ymax_UTM)
 			v2.transform(trUTMLL)
 			symb.setGeometryExpression('make_line(make_point('+str(v1.x())+','+str(ymin_source)+'), make_point('+str(v2.x())+','+str(ymax_source)+'))')
 		
 		#Horizontal
 		elif (not(u == 1)) and (not(u == UTM_num_y)) and t == 0:
-			h1 = QgsPoint(((floor(xmin_UTM/grid_spacing)+1)*grid_spacing),((floor(ymin_UTM/grid_spacing)+u)*grid_spacing))
+			h1 = QgsPoint(xmin_UTM, ((floor(ymin_UTM/grid_spacing)+u)*grid_spacing))
 			h1.transform(trUTMLL)
-			h2 = QgsPoint(((floor(xmax_UTM/grid_spacing)+1)*grid_spacing),((floor(ymin_UTM/grid_spacing)+u)*grid_spacing))
+			h2 = QgsPoint(xmax_UTM, ((floor(ymin_UTM/grid_spacing)+u)*grid_spacing))
 			h2.transform(trUTMLL)
 			symb.setGeometryExpression("make_line(make_point("+str(xmin_source)+","+str(h1.y())+"), make_point("+str(xmax_source)+","+str(h2.y())+"))")
 
