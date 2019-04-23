@@ -2,6 +2,8 @@ from builtins import str, range, abs, round
 from math import floor, ceil, pow
 from qgis.core import QgsProject, QgsVectorLayer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsFillSymbol, QgsPoint, QgsGeometry, QgsGeometryGeneratorSymbolLayer
 from qgis.core import QgsRuleBasedLabeling, QgsPalLayerSettings, QgsTextFormat, QgsPropertyCollection
+from qgis.utils import iface
+from qgis.gui import QgsMessageBar
 from PyQt5.QtGui import QColor, QFont
 
 
@@ -14,7 +16,7 @@ class GridAndLabelCreator(object):
 	def geo_test(layer):
 		
 		if layer.crs().isGeographic() == False:
-			self.iface.messageBar().pushMessage("Error", "Layer CRS is not geographic, please transform to a geographic CRS", level=Qgis.Critical)
+			iface.messageBar().pushCritical("Error", "Layer CRS is not geographic, please transform to a geographic CRS")
 			return False
 		
 		pass
@@ -249,7 +251,8 @@ class GridAndLabelCreator(object):
 		#Getting Feature Source CRS and Geometry
 		bound_sourcecrs = layer_bound.crs().authid()
 		feature_bbox = feature_bound.geometry().boundingBox()
-		GridAndLabelCreator.geo_test(layer_bound)
+		if GridAndLabelCreator.geo_test(layer_bound) == False:
+			return
 		geo_bound_bb = str(feature_bbox).replace(',','').replace('>','')
 
 		#Defining CRSs Transformations
