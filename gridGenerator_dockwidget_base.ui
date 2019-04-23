@@ -46,6 +46,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="showCrs">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QLabel" name="gridColorLabel">
     <property name="geometry">
@@ -94,6 +97,9 @@
       <width>82</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="value">
+     <double>4.250000000000000</double>
     </property>
    </widget>
    <widget class="QLabel" name="labelFont">
@@ -169,6 +175,9 @@
     </property>
     <property name="maximum">
      <number>999999</number>
+    </property>
+    <property name="singleStep">
+     <number>1000</number>
     </property>
    </widget>
    <widget class="QLabel" name="labelFontSizeLabel">
