@@ -28,7 +28,7 @@ from PyQt5 import QtGui, QtWidgets, uic
 from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtCore import pyqtSignal
 from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox, QgsSpinBox, QgsDoubleSpinBox, QgsColorButton
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsMapLayerProxyModel
 from .Gui.GridLabel import *
 
 
@@ -50,7 +50,7 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # http://doc.qt.io/qt-5/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-
+        self.mapLayerSelection.setFilters(QgsMapLayerProxyModel.PolygonLayer)
         self.mapLayerSelection.layerChanged.connect(self.attributeSelection.setLayer)
 
         self.okButton.pressed.connect(self.send_inputs)
