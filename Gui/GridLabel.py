@@ -1,6 +1,6 @@
 from builtins import str, range, abs, round
 from math import floor, ceil, pow
-from qgis.core import QgsProject, QgsVectorLayer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsFillSymbol, QgsPoint, QgsGeometry, QgsGeometryGeneratorSymbolLayer
+from qgis.core import QgsProject, QgsVectorLayer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsFillSymbol, QgsSimpleFillSymbolLayer, QgsInvertedPolygonRenderer, QgsPoint, QgsGeometry, QgsGeometryGeneratorSymbolLayer
 from qgis.core import QgsRuleBasedLabeling, QgsPalLayerSettings, QgsTextFormat, QgsPropertyCollection
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
@@ -271,6 +271,9 @@ class GridAndLabelCreator(object):
 		renderer = layer_bound.renderer()
 		properties = {'color': 'black'}
 		grid_symb = QgsFillSymbol.createSimple(properties)
+		symb_out = QgsSimpleFillSymbolLayer()
+		symb_out.setStrokeColor(QColor('white'))
+		symb_out.setFillColor(QColor('white'))
 
 
 		""" Creating UTM Grid """
@@ -329,10 +332,13 @@ class GridAndLabelCreator(object):
 
 
 		""" Rendering UTM and Geographic Grid """
-		grid_symb.deleteSymbolLayer(0)
 		grid_symb.setColor(grid_color)
+		grid_symb.changeSymbolLayer(0, symb_out)
 		renderer.setSymbol(grid_symb)
-		
+		# Changing Renderer To Inverted Polygon
+		new_renderer = QgsInvertedPolygonRenderer.convertFromRenderer(renderer)
+		layer_bound.setRenderer(new_renderer)
+
 		
 		""" Labeling Geo Grid """
 		root_rule = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
