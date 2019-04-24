@@ -403,6 +403,7 @@ class GridAndLabelCreator(object):
 		rules = QgsRuleBasedLabeling(root_rule)
 		layer_bound.setLabeling(rules)
 		layer_bound.setLabelsEnabled(True)
+		layer_bound.triggerRepaint()
 
 		return
 
