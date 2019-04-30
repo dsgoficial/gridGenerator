@@ -17,7 +17,7 @@ email=joao.felipe@eb.mil.br
 about=Creates UTM and geopgraphic symbology and labels.
 
 tracker=http://test
-repository=http://test
+repository=https://github.com/JoaoFelipeAGuimaraes/GridLabelGenerator
 # End of mandatory metadata
 
 # Recommended items:
