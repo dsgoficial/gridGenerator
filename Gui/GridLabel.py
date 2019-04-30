@@ -194,8 +194,8 @@ class GridAndLabelCreator(object):
 				fSize = 7.08*fSize/4.25
 			elif label_index == 3:
 				expression_str = str('\'')+full_label[-3 : ]+str('\'')
-    
-		# Label Format Settings
+
+        # Label Format Settings
 		settings = QgsPalLayerSettings()
 		settings.Placement = QgsPalLayerSettings.Free
 		settings.isExpression = True
@@ -228,7 +228,10 @@ class GridAndLabelCreator(object):
 	def Conv_dec_gms (base_coord, coord_spacing, u, neg_character, pos_character):
 		
 		x = base_coord + coord_spacing*u
-		conv_exp_str = 'concat(floor(round(abs('+str(x)+'),4)),'+str('\'º\'')+','+str('\' \'')+',floor(round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60),'+str('\'\'\'\'')+','+str('\' \'')+',round((round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60-floor(round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60))*60),'+str('\'"\'')+',if('+str(x)+'<0, '+str('\' ')+neg_character+str('\'')+','+str('\' ')+pos_character+str('\'')+'))'
+		conv_exp_str = 'concat(floor(round(abs('+str(x)+'),4)),'+str('\'º\'')+','+str('\' \'')+', if(round((round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60-floor(round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x) \
+			+'),4)),4)*60))*60) = 60, concat(floor(round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60)+1,'+str('\' 0\'\'\'')+'), concat(floor(round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60),'+str('\'"\'') \
+			+','+str('\' \'')+',round((round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60-floor(round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60))*60),'+str('\'\'\'\'')+')),if('+str(x) \
+			+'<0, '+str('\' ')+neg_character+str('\'')+','+str('\' ')+pos_character+str('\'')+'))'
 		
 		return conv_exp_str
 
