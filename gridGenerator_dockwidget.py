@@ -70,7 +70,7 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         color = self.gridColor.color()
         fontSize = self.labelFontSize.value()
         font = self.fontType.currentFont()
-        GridAndLabelCreator.styleCreator(layer, attribute, spacing, crossX, crossY, scale, color, fontSize, font)
+        GridAndLabelCreator.geo_test(layer, attribute, spacing, crossX, crossY, scale, color, fontSize, font)
 
 
     def closeEvent(self, event):
