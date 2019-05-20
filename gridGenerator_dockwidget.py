@@ -52,17 +52,21 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.setupUi(self)
         self.mapLayerSelection.setFilters(QgsMapLayerProxyModel.PolygonLayer)
         self.mapLayerSelection.layerChanged.connect(self.attributeSelection.setLayer)
+        self.mapLayerSelection.layerChanged.connect(self.idSelection.setLayer)
 
         self.okButton.pressed.connect(self.send_inputs)
+        self.resetButton.pressed.connect(self.send_reset)
 
 
     def send_inputs(self):
 
-        if (not self.mapLayerSelection.currentLayer()) and (self.attributeSelection.currentField()) and (self.utmSpacing.value()) and (self.crossesX.value()) and (self.crossesY.value()) and (self.mapScale.value()) and (self.gridColor.color()) and (self.labelFontSize.value()) and (self.fontType.currentFont()):
+        if (not self.mapLayerSelection.currentLayer()) and (self.attributeSelection.currentField()) and (self.idSelection.currentField()) and (self.idValue.value()) and (self.utmSpacing.value()) and (self.crossesX.value()) and (self.crossesY.value()) and (self.mapScale.value()) and (self.gridColor.color()) and (self.labelFontSize.value()) and (self.fontType.currentFont()):
             return
 
         layer = self.mapLayerSelection.currentLayer()
         attribute = self.attributeSelection.currentField()
+        id_attr = self.idSelection.currentField()
+        id_value = self.idValue.value()
         spacing = self.utmSpacing.value()
         crossX = self.crossesX.value()
         crossY = self.crossesY.value()
@@ -70,8 +74,12 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         color = self.gridColor.color()
         fontSize = self.labelFontSize.value()
         font = self.fontType.currentFont()
-        GridAndLabelCreator.geo_test(layer, attribute, spacing, crossX, crossY, scale, color, fontSize, font)
+        GridAndLabelCreator.geo_test(layer, attribute, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font)
 
+
+    def send_reset(self):
+        layer = self.mapLayerSelection.currentLayer()
+        GridAndLabelCreator.reset(layer)
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
