@@ -13,12 +13,28 @@ class GridAndLabelCreator(object):
 		super(GridLabel, self).__init__(parent)
 
 
-	def geo_test(layer, index, spacing, crossX, crossY, scale, color, fontSize, font):
+	def reset(layer):
+		layer_rst = layer
+		properties = {'color': 'black'}
+		grid_symb = QgsFillSymbol.createSimple(properties)
+		symb_out = QgsSimpleFillSymbolLayer()
+		grid_symb.changeSymbolLayer(0, symb_out)
+		render_base = QgsSingleSymbolRenderer(grid_symb)
+		layer_rst.setRenderer(render_base)
+		root_rule = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
+		rules = QgsRuleBasedLabeling(root_rule)
+		layer_rst.setLabeling(rules)
+		layer_rst.setLabelsEnabled(False)
+		layer_rst.triggerRepaint()
+		return
+	
+
+	def geo_test(layer, index, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font):
 		
 		if layer.crs().isGeographic() == False:
-			GridAndLabelCreator.styleCreatorUTM(layer, index, spacing, crossX, crossY, scale, color, fontSize, font)
+			GridAndLabelCreator.styleCreatorUTM(layer, index, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font)
 		else:
-			GridAndLabelCreator.styleCreator(layer, index, spacing, crossX, crossY, scale, color, fontSize, font)
+			GridAndLabelCreator.styleCreator(layer, index, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font)
 		pass
 	
 	
@@ -336,8 +352,7 @@ class GridAndLabelCreator(object):
 
 
 
-	def styleCreator (layer, index, spacing, crossX, crossY, scale, color, fontSize, font):
-		
+	def styleCreator (layer, index, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font):
 		grid_spacing = spacing
 		geo_number_x = crossX
 		geo_number_y = crossY
@@ -348,7 +363,10 @@ class GridAndLabelCreator(object):
 		
 		#Loading feature
 		layer_bound = layer
-		feature_bound = layer_bound.getFeature(0)
+		query = '"'+str(id_attr)+'"='+str(id_value)
+		layer_bound.selectByExpression(query, QgsVectorLayer.SelectBehavior(0))
+		feature_bound = layer_bound.selectedFeatures()[0]
+		layer_bound.removeSelection()
 
 		#Getting Feature Source CRS and Geometry
 		bound_sourcecrs = layer_bound.crs().authid()
@@ -509,7 +527,7 @@ class GridAndLabelCreator(object):
 		return
 
 
-	def styleCreatorUTM (layer, index, spacing, crossX, crossY, scale, color, fontSize, font):
+	def styleCreatorUTM (layer, index, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font):
 		
 		grid_spacing = spacing
 		geo_number_x = crossX
@@ -521,7 +539,10 @@ class GridAndLabelCreator(object):
 		
 		#Loading feature
 		layer_bound = layer
-		feature_bound = layer_bound.getFeature(0)
+		query = '"'+str(id_attr)+'"='+str(id_value)
+		layer_bound.selectByExpression(query, QgsVectorLayer.SelectBehavior(0))
+		feature_bound = layer_bound.selectedFeatures()[0]
+		layer_bound.removeSelection()
 
 		# Getting Feature Source CRS and Geometry
 		feature_geometry = feature_bound.geometry()
