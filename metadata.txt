@@ -10,7 +10,7 @@
 name=GridGenerator
 qgisMinimumVersion=3.0
 description=Creates UTM and geopgraphic symbology and labels for given bounding feature.
-version=0.1
+version=1.0
 author=Joao Felipe Aguiar Guimaraes
 email=joao.felipe@eb.mil.br
 
