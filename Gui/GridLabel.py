@@ -235,11 +235,16 @@ class GridAndLabelCreator(object):
 
 	def conv_dec_gms (base_coord, coord_spacing, u, neg_character, pos_character):
 		
-		x = base_coord + coord_spacing*u
-		conv_exp_str = 'concat(floor(round(abs('+str(x)+'),4)),'+str('\'º\'')+','+str('\' \'')+', if(round((round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60-floor(round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x) \
-			+'),4)),4)*60))*60) = 60, concat(floor(round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60)+1,'+str('\' 0\'\'\'')+'), concat(floor(round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60),'+str('\'"\'') \
-			+','+str('\' \'')+',round((round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60-floor(round((-floor(round(abs('+str(x)+'),4))+round(abs('+str(x)+'),4)),4)*60))*60),'+str('\'\'\'\'')+')),if('+str(x) \
-			+'<0, '+str('\' ')+neg_character+str('\'')+','+str('\' ')+pos_character+str('\'')+'))'
+		xbase = base_coord + coord_spacing*u
+		x = abs(xbase)
+		xdeg = floor(round(x,4))
+		xmin = floor(round(((x - xdeg)*60),4))
+		xseg = floor(round(((x - xdeg - xmin/60)*60),4))
+		if xbase < 0:
+			xhem = neg_character
+		else:
+			xhem = pos_character
+		conv_exp_str = '\''+str(xdeg)+'º '+str(xmin)+str('\\')+str('\' ')+str(xseg)+'"\''+'+\' '+str(xhem)+'\''
 		
 		return conv_exp_str
 
@@ -294,7 +299,7 @@ class GridAndLabelCreator(object):
 		properties = {'color': 'black'}
 		grid_symb = QgsFillSymbol.createSimple(properties)
 		symb_out = QgsSimpleFillSymbolLayer()
-		symb_out.setStrokeColor(QColor('white'))
+		symb_out.setStrokeColor(QColor('black'))
 		symb_out.setFillColor(QColor('white'))
 
 
@@ -368,12 +373,20 @@ class GridAndLabelCreator(object):
 		root_rule = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
 		#Upper
 		for u in range(0, geo_number_x+2):
-			ruletemp = GridAndLabelCreator.grid_labeler (xmin_source, ymax_source, px, py, u, 0, 0, (0.00015*map_scaleX), '', 'Center', 'Up '+str(u+1), fSize, fontType, GridAndLabelCreator.conv_dec_gms(xmin_source, px, u, 'W', 'E'), trLLUTM, utmcheck)
-			root_rule.appendChild(ruletemp)
+			if u ==0:
+				ruletemp = GridAndLabelCreator.grid_labeler (xmin_source, ymax_source, px, py, u, 0, 0, (0.00015*map_scaleX), '', 'Center', 'Up '+str(u+1), fSize, fontType, str(GridAndLabelCreator.conv_dec_gms(xmin_source, px, u, 'W', 'E'))+'+\'. DE GREENWICH\'', trLLUTM, utmcheck)
+				root_rule.appendChild(ruletemp)
+			else:
+				ruletemp = GridAndLabelCreator.grid_labeler (xmin_source, ymax_source, px, py, u, 0, 0, (0.00015*map_scaleX), '', 'Center', 'Up '+str(u+1), fSize, fontType, GridAndLabelCreator.conv_dec_gms(xmin_source, px, u, 'W', 'E'), trLLUTM, utmcheck)
+				root_rule.appendChild(ruletemp)
 		#Bottom
 		for b in range(0, geo_number_x+2):
-			ruletemp = GridAndLabelCreator.grid_labeler (xmin_source, ymin_source, px, py, b, 0, 0, (-0.00040*map_scaleX), '', 'Center', 'Bot '+str(b+1), fSize, fontType, GridAndLabelCreator.conv_dec_gms(xmin_source, px, b, 'W', 'E'), trLLUTM, utmcheck)
-			root_rule.appendChild(ruletemp)
+			if b ==0:
+				ruletemp = GridAndLabelCreator.grid_labeler (xmin_source, ymin_source, px, py, b, 0, 0, (-0.00040*map_scaleX), '', 'Center', 'Bot '+str(b+1), fSize, fontType, str(GridAndLabelCreator.conv_dec_gms(xmin_source, px, b, 'W', 'E'))+'+\'. DE GREENWICH\'', trLLUTM, utmcheck)
+				root_rule.appendChild(ruletemp)
+			else:
+				ruletemp = GridAndLabelCreator.grid_labeler (xmin_source, ymin_source, px, py, b, 0, 0, (-0.00040*map_scaleX), '', 'Center', 'Bot '+str(b+1), fSize, fontType, GridAndLabelCreator.conv_dec_gms(xmin_source, px, b, 'W', 'E'), trLLUTM, utmcheck)
+				root_rule.appendChild(ruletemp)
 		#Right
 		for r in range(0, geo_number_y+2):
 			ruletemp = GridAndLabelCreator.grid_labeler (xmax_source, ymin_source, px, py, 0, r, (0.00018*map_scaleX), 0, 'Half', '', 'Right '+str(r+1), fSize, fontType, GridAndLabelCreator.conv_dec_gms(ymin_source, py, r, 'S', 'N'), trLLUTM, utmcheck)
