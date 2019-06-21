@@ -415,8 +415,8 @@ class GridAndLabelCreator(object):
 			dy = [0.0017*map_scale*fSize/4.25, -0.0034*map_scale*fSize/4.25]
 		else:
 			map_scale_LL = scale/10
-			dx = [0.00018*map_scaleX, -0.00120*map_scaleX]
-			dy = [0.00015*map_scaleX, -0.00040*map_scaleX]
+			dx = [0.00018*map_scale_LL, -0.00120*map_scale_LL]
+			dy = [0.00015*map_scale_LL, -0.00040*map_scale_LL]
 		#Upper
 		for u in range(0, geo_number_x+2):
 			if u ==0:
