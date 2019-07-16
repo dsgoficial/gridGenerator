@@ -225,7 +225,7 @@ class GridAndLabelCreator(object):
 			y =ancY.y()
 			full_label = str((floor(x_UTM/grid_spacing)+u)*grid_spacing)
 			if x < x_min or x > x_max:
-				return GridAndLabelCreator.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck)
+				return GridAndLabelCreator.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck, map_scale/1000)
 
 		# Labeling grid's horizontal lines
 		else:
@@ -259,7 +259,7 @@ class GridAndLabelCreator(object):
 			y = ancY.y()
 			full_label = str((floor(y_UTM/grid_spacing)+u)*grid_spacing)
 			if y < y_min or y > y_max:
-				return GridAndLabelCreator.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck)
+				return GridAndLabelCreator.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck, map_scale/1000)
 
 		if label_index == 1:
 			expression_str = full_label[ : len( full_label )-5]
@@ -430,7 +430,7 @@ class GridAndLabelCreator(object):
 		root_rule = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
 		if utmcheck:
 			dx = [0.002*map_scale*fSize/1.5, -0.0136*map_scale*fSize/1.5]
-			dy = [0.0017*map_scale*fSize/1.5, -0.0034*map_scale*fSize/1.5]
+			dy = [0.0017*map_scale*fSize/1.5, -0.0038*map_scale*fSize/1.5]
 		else:
 			map_scale_LL = scale/10
 			dx = [0.00018*map_scale_LL, -0.00120*map_scale_LL]
@@ -459,8 +459,8 @@ class GridAndLabelCreator(object):
 		""" Labeling UTM Grid"""
 		if utmcheck:
 			dx = [-0.0026*map_scale*fSize/1.5, 0.0017*map_scale*fSize/1.5, -0.0093*map_scale*fSize/1.5, -0.0061*map_scale*fSize/1.5, -0.0046*map_scale*fSize/1.5, 0.0020*map_scale*fSize/1.5, 0.0052*map_scale*fSize/1.5, 0.0067*map_scale*fSize/1.5, 0.0058*map_scale*fSize/1.5, -0.0005*map_scale*fSize/1.5]
-			dy = [0.0025*map_scale*fSize/1.5, 0.00155*map_scale*fSize/1.5, -0.0034*map_scale*fSize/1.5, -0.0047*map_scale*fSize/1.5, -0.0005*map_scale, -0.0015*map_scale]
-			dy0 = [0.00545*map_scale*fSize/1.5, 0.004475*map_scale*fSize/1.5, -0.0065*map_scale*fSize/1.5, -0.0076*map_scale*fSize/1.5, -0.0032*map_scale, -0.0042*map_scale]
+			dy = [0.0025*map_scale*fSize/1.5, 0.00155*map_scale*fSize/1.5, -0.0038*map_scale*fSize/1.5, -0.0051*map_scale*fSize/1.5, -0.0005*map_scale, -0.0015*map_scale]
+			dy0 = [0.00545*map_scale*fSize/1.5, 0.004475*map_scale*fSize/1.5, -0.0069*map_scale*fSize/1.5, -0.0080*map_scale*fSize/1.5, -0.0032*map_scale, -0.0042*map_scale]
 			dy1 = [0.00215*map_scale, 0.0012*map_scale]
 		else:
 			map_scale_LL = scale/10
