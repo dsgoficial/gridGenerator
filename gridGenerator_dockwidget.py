@@ -60,7 +60,7 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     def send_inputs(self):
 
-        if (not self.mapLayerSelection.currentLayer()) and (self.attributeSelection.currentField()) and (self.idSelection.currentField()) and (self.idValue.value()) and (self.utmSpacing.value()) and (self.crossesX.value()) and (self.crossesY.value()) and (self.mapScale.value()) and (self.gridColor.color()) and (self.labelFontSize.value()) and (self.fontType.currentFont()):
+        if (not self.mapLayerSelection.currentLayer()) and (self.attributeSelection.currentField()) and (self.idSelection.currentField()) and (self.idValue.value()) and (self.utmSpacing.value()) and (self.crossesX.value()) and (self.crossesY.value()) and (self.mapScale.value()) and (self.gridColor.color()) and (self.labelFontSize.value()) and (self.fontType.currentFont()) and (self.fontTypeLL.currentFont()):
             return
 
         layer = self.mapLayerSelection.currentLayer()
@@ -74,7 +74,9 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         color = self.gridColor.color()
         fontSize = self.labelFontSize.value()
         font = self.fontType.currentFont()
-        GridAndLabelCreator.geo_test(layer, attribute, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font)
+        fontLL = self.fontTypeLL.currentFont()
+        llcolor = self.llColor.color()
+        GridAndLabelCreator.geo_test(layer, attribute, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor)
 
 
     def send_reset(self):

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>433</width>
-    <height>448</height>
+    <width>432</width>
+    <height>542</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,8 +53,8 @@
    <widget class="QLabel" name="gridColorLabel">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>220</y>
+      <x>100</x>
+      <y>280</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -80,7 +80,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>390</y>
+      <y>470</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -92,21 +92,21 @@
    <widget class="QgsDoubleSpinBox" name="labelFontSize">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>340</y>
+      <x>268</x>
+      <y>410</y>
       <width>82</width>
       <height>21</height>
      </rect>
     </property>
     <property name="value">
-     <double>4.250000000000000</double>
+     <double>1.500000000000000</double>
     </property>
    </widget>
    <widget class="QLabel" name="labelFont">
     <property name="geometry">
      <rect>
       <x>112</x>
-      <y>310</y>
+      <y>340</y>
       <width>61</width>
       <height>21</height>
      </rect>
@@ -131,8 +131,8 @@
    <widget class="QgsColorButton" name="gridColor">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>250</y>
+      <x>70</x>
+      <y>310</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -153,6 +153,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="value">
+     <number>4</number>
+    </property>
    </widget>
    <widget class="QgsSpinBox" name="crossesY">
     <property name="geometry">
@@ -162,6 +165,9 @@
       <width>71</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="value">
+     <number>4</number>
     </property>
    </widget>
    <widget class="QgsSpinBox" name="utmSpacing">
@@ -179,18 +185,21 @@
     <property name="singleStep">
      <number>1000</number>
     </property>
+    <property name="value">
+     <number>2000</number>
+    </property>
    </widget>
    <widget class="QLabel" name="labelFontSizeLabel">
     <property name="geometry">
      <rect>
-      <x>262</x>
-      <y>310</y>
-      <width>91</width>
+      <x>250</x>
+      <y>380</y>
+      <width>111</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Labels' Font Size</string>
+     <string>Labels' Font Size (mm)</string>
     </property>
    </widget>
    <widget class="QLabel" name="selectAttribute">
@@ -222,7 +231,7 @@
    <widget class="QgsDoubleSpinBox" name="mapScale">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>150</x>
       <y>250</y>
       <width>121</width>
       <height>20</height>
@@ -231,11 +240,14 @@
     <property name="maximum">
      <double>999999.000000000000000</double>
     </property>
+    <property name="value">
+     <double>50.000000000000000</double>
+    </property>
    </widget>
    <widget class="QLabel" name="mapScaleLabel">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>160</x>
       <y>220</y>
       <width>121</width>
       <height>21</height>
@@ -249,17 +261,20 @@
     <property name="geometry">
      <rect>
       <x>60</x>
-      <y>340</y>
+      <y>370</y>
       <width>161</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="currentText">
+     <string>Xerox Sans Serif Narrow</string>
     </property>
    </widget>
    <widget class="QPushButton" name="resetButton">
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>390</y>
+      <y>470</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -315,6 +330,58 @@
     </property>
     <property name="maximum">
      <number>9999999</number>
+    </property>
+    <property name="value">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="QgsColorButton" name="llColor">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>310</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="llColorLabel">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>280</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>LatLong Label Color</string>
+    </property>
+   </widget>
+   <widget class="QFontComboBox" name="fontTypeLL">
+    <property name="geometry">
+     <rect>
+      <x>58</x>
+      <y>430</y>
+      <width>161</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="currentText">
+     <string>Arial</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelFont_2">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>400</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>LatLong Labels' Font</string>
     </property>
    </widget>
   </widget>
