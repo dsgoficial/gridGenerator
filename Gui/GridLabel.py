@@ -276,9 +276,9 @@ class GridAndLabelCreator(object):
 		elif label_index == 4:
 			expression_str = ''
 			if u == 1:
-				expression_str = '\'E\''
+				expression_str = '\'N\''
 				if isVertical:
-					expression_str = '\'N\''
+					expression_str = '\'E\''
 				fSize = fSize*5/3
 				fontType.setWeight(57)
 
