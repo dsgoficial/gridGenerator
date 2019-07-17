@@ -214,7 +214,7 @@ class GridAndLabelCreator(object):
 				ancY.transform(trLLUTM)
 			test = QgsPoint(((floor(x_UTM/grid_spacing)+u)*grid_spacing),y_UTM)
 			test.transform(trUTMLL)
-			testif = abs(floor(abs(round(test.x(), 4) - (x_min % (px)) - (0.001 *map_scale/10000))/px) - floor(abs(round(test.x(), 4) - (x_min % (px)) + (0.001 *map_scale/10000))/px))
+			testif = abs(floor(abs(round(test.x(), 4) - (x_min % (px)) - (0.001 *map_scale/10000))/px) - floor(abs(round(test.x(), 4) - (x_min % (px)) + (0.0015 *map_scale/10000))/px))
 			if testif >= 1:
 				ancY = QgsPoint(ancY.x(),ancY.y()+dyO)
 			else:
@@ -270,7 +270,7 @@ class GridAndLabelCreator(object):
 			fontType.setWeight(57)
 		elif label_index == 3:
 			expression_str = str('\'')+full_label[-3 : ]+str('\'')
-			if u == 1 and 'bot' in desc:
+			if u == 1 and (('Bot' in desc) or ('Left' in desc)):
 				expression_str =str('\'')+full_label[-3 : ]+str('m\'')
 			fontType.setWeight(50)
 		elif label_index == 4:
