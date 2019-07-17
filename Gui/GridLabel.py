@@ -270,7 +270,7 @@ class GridAndLabelCreator(object):
 			fontType.setWeight(57)
 		elif label_index == 3:
 			expression_str = str('\'')+full_label[-3 : ]+str('\'')
-			if u == 1:
+			if u == 1 and 'bot' in desc:
 				expression_str =str('\'')+full_label[-3 : ]+str('m\'')
 			fontType.setWeight(50)
 		elif label_index == 4:
