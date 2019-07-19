@@ -184,6 +184,7 @@ class GridAndLabelCreator(object):
 			datadefined.setProperty(11, hAlign)
 		if not(vAlign == ''):
 			datadefined.setProperty(12, vAlign)
+		datadefined.setProperty(20, 1)
 
 		#Creating and Activating Labeling Rule
 		settings.setDataDefinedProperties(datadefined)
