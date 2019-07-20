@@ -225,7 +225,7 @@ class GridAndLabelCreator(object):
 				ancY.transform(trUTMLL)
 			y =ancY.y()
 			full_label = str((floor(x_UTM/grid_spacing)+u)*grid_spacing)
-			if x < (x_min + (0.0015*(fSize/1.5) *map_scale/10000)) or x > (x_max - (0.001*(fSize/1.5) *map_scale/10000)):
+			if x < (x_min + (0.001*(fSize/1.5) *map_scale/10000)) or x > (x_max - (0.001*(fSize/1.5) *map_scale/10000)):
 				return GridAndLabelCreator.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck, map_scale/1000)
 
 		# Labeling grid's horizontal lines
