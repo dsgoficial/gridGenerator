@@ -208,7 +208,7 @@ class GridAndLabelCreator(object):
 			else:
 				dx0 = dx
 				dx = 0
-			test_plac = QgsPoint(((floor(x_UTM/grid_spacing)+u)*grid_spacing)+dx,y_UTM)
+			test_plac = QgsPoint(((floor(x_UTM/grid_spacing)+u)*grid_spacing),y_UTM)
 			test_plac.transform(trUTMLL)
 			ancX = QgsPoint(((floor(x_UTM/grid_spacing)+u)*grid_spacing)+dx,y_UTM)
 			ancX.transform(trUTMLL)
@@ -267,12 +267,14 @@ class GridAndLabelCreator(object):
 				return GridAndLabelCreator.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck, map_scale/1000)
 
 		if label_index == 1:
-			expression_str = full_label[ : len( full_label )-5]
+			expression_str = full_label[ : -5]
 			fontType.setWeight(50)
 		elif label_index == 2:
-			expression_str = str('\'')+full_label[len( full_label )-5 : -3]+str('\'')
+			expression_str = str('\'')+full_label[-5 : -3]+str('\'')
 			fSize = fSize*5/3
 			fontType.setWeight(57)
+			if len(expression_str) == 3:
+				hAlign = 'Left'
 		elif label_index == 3:
 			expression_str = str('\'')+full_label[-3 : ]+str('\'')
 			if u == min(rangetest) and (('Bot' in desc) or ('Left' in desc)):
