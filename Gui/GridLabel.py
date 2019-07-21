@@ -483,7 +483,7 @@ class GridAndLabelCreator(object):
 			dx = [-0.0027*map_scale*fSize/1.5, 0.0018*map_scale*fSize/1.5, -0.0097*map_scale*fSize/1.5, -0.0062*map_scale*fSize/1.5, -0.0046*map_scale*fSize/1.5, 0.0020*map_scale*fSize/1.5, 0.0054*map_scale*fSize/1.5, 0.0070*map_scale*fSize/1.5, 0.0061*map_scale*fSize/1.5, -0.0035*map_scale*fSize/1.5]
 			dy = [0.0025*map_scale*fSize/1.5, 0.00155*map_scale*fSize/1.5, -0.0038*map_scale*fSize/1.5, -0.0051*map_scale*fSize/1.5, -0.0005*map_scale*fSize/1.5, -0.0015*map_scale*fSize/1.5]
 			dy0 = [0.00545*map_scale*fSize/1.5, 0.004475*map_scale*fSize/1.5, -0.0069*map_scale*fSize/1.5, -0.0080*map_scale*fSize/1.5, -0.0032*map_scale*fSize/1.5, -0.0042*map_scale*fSize/1.5]
-			dy1 = [0.00215*map_scale, 0.0012*map_scale]
+			dy1 = [0.00215*map_scale*fSize/1.5, 0.0012*map_scale*fSize/1.5]
 		else:
 			map_scale_LL = scale/10
 			dx = [-0.0003*map_scale_LL*fSize/1.5, 0.00018*map_scale_LL*fSize/1.5, -0.00107*map_scale_LL*fSize/1.5, -0.00070*map_scale_LL*fSize/1.5, -0.00053*map_scale_LL*fSize/1.5, 0.00023*map_scale_LL*fSize/1.5, 0.00060*map_scale_LL*fSize/1.5, 0.00079*map_scale_LL*fSize/1.5]
