@@ -208,6 +208,8 @@ class GridAndLabelCreator(object):
 			else:
 				dx0 = dx
 				dx = 0
+			test_plac = QgsPoint(((floor(x_UTM/grid_spacing)+u)*grid_spacing)+dx,y_UTM)
+			test_plac.transform(trUTMLL)
 			ancX = QgsPoint(((floor(x_UTM/grid_spacing)+u)*grid_spacing)+dx,y_UTM)
 			ancX.transform(trUTMLL)
 			ancY = QgsPoint(ancX.x(),y_geo)
@@ -225,11 +227,13 @@ class GridAndLabelCreator(object):
 				ancY.transform(trUTMLL)
 			y =ancY.y()
 			full_label = str((floor(x_UTM/grid_spacing)+u)*grid_spacing)
-			if x < (x_min + (0.001*(fSize/1.5) *map_scale/10000)) or x > (x_max - (0.001*(fSize/1.5) *map_scale/10000)):
+			if test_plac.x() < (x_min + (0.0005*(fSize/1.5) *map_scale/10000)) or test_plac.x() > (x_max - (0.0005*(fSize/1.5) *map_scale/10000)):
 				return GridAndLabelCreator.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck, map_scale/1000)
 
 		# Labeling grid's horizontal lines
 		else:
+			test_plac = QgsPoint(x_UTM,(floor(y_UTM/grid_spacing)+u)*grid_spacing)
+			test_plac.transform(trUTMLL)
 			ancX = QgsPoint(x_UTM,(floor(y_UTM/grid_spacing)+u)*grid_spacing)
 			ancX.transform(trUTMLL)
 			ancX = QgsPoint(x_geo, ancX.y())
@@ -259,7 +263,7 @@ class GridAndLabelCreator(object):
 			x = ancX.x() + dx0
 			y = ancY.y()
 			full_label = str((floor(y_UTM/grid_spacing)+u)*grid_spacing)
-			if y < (y_min + (0.0004*(fSize/1.5) *map_scale/10000)) or y > (y_max- (0.0004*(fSize/1.5) *map_scale/10000)):
+			if test_plac.y() < (y_min + (0.0002*(fSize/1.5) *map_scale/10000)) or test_plac.y() > (y_max- (0.0002*(fSize/1.5) *map_scale/10000)):
 				return GridAndLabelCreator.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck, map_scale/1000)
 
 		if label_index == 1:
