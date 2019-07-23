@@ -217,7 +217,7 @@ class GridAndLabelCreator(object):
 				ancY.transform(trLLUTM)
 			test = QgsPoint(((floor(x_UTM/grid_spacing)+u)*grid_spacing),y_UTM)
 			test.transform(trUTMLL)
-			testif = abs(floor(abs(round(test.x(), 4) - (x_min % (px)) - (0.001*(fSize/1.5) *map_scale/10000))/px) - floor(abs(round(test.x(), 4) - (x_min % (px)) + (0.0015*(fSize/1.5) *map_scale/10000))/px))
+			testif = abs(floor(abs(round(test.x(), 4) - (x_min % (px)) - (0.0012*(fSize/1.5) *map_scale/10000))/px) - floor(abs(round(test.x(), 4) - (x_min % (px)) + (0.0015*(fSize/1.5) *map_scale/10000))/px))
 			if testif >= 1:
 				ancY = QgsPoint(ancY.x(),ancY.y()+dyO)
 			else:
