@@ -217,7 +217,13 @@ class GridAndLabelCreator(object):
 				ancY.transform(trLLUTM)
 			test = QgsPoint(((floor(x_UTM/grid_spacing)+u)*grid_spacing),y_UTM)
 			test.transform(trUTMLL)
-			testif = abs(floor(abs(round(test.x(), 4) - (x_min % (px)) - (0.0012*(fSize/1.5) *map_scale/10000))/px) - floor(abs(round(test.x(), 4) - (x_min % (px)) + (0.0015*(fSize/1.5) *map_scale/10000))/px))
+			if u == 1:
+				deltaDneg = 0.0014
+				deltaDpos = 0.0016
+			else:
+				deltaDneg = 0.0010
+				deltaDpos = 0.0015
+			testif = abs(floor(abs(round(test.x(), 4) - (x_min % (px)) - (deltaDneg*(fSize/1.5) *map_scale/10000))/px) - floor(abs(round(test.x(), 4) - (x_min % (px)) + (deltaDpos*(fSize/1.5) *map_scale/10000))/px))
 			if testif >= 1:
 				ancY = QgsPoint(ancY.x(),ancY.y()+dyO)
 			else:
@@ -227,7 +233,7 @@ class GridAndLabelCreator(object):
 				ancY.transform(trUTMLL)
 			y =ancY.y()
 			full_label = str((floor(x_UTM/grid_spacing)+u)*grid_spacing)
-			if test_plac.x() < (x_min + (0.0005*(fSize/1.5) *map_scale/10000)) or test_plac.x() > (x_max - (0.0005*(fSize/1.5) *map_scale/10000)):
+			if test_plac.x() < (x_min + (0.0005 *map_scale/10000)) or test_plac.x() > (x_max - (0.0005 *map_scale/10000)):
 				return GridAndLabelCreator.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck, map_scale/1000)
 
 		# Labeling grid's horizontal lines
@@ -263,7 +269,7 @@ class GridAndLabelCreator(object):
 			x = ancX.x() + dx0
 			y = ancY.y()
 			full_label = str((floor(y_UTM/grid_spacing)+u)*grid_spacing)
-			if test_plac.y() < (y_min + (0.0002*(fSize/1.5) *map_scale/10000)) or test_plac.y() > (y_max- (0.0002*(fSize/1.5) *map_scale/10000)):
+			if test_plac.y() < (y_min + (0.0002 *map_scale/10000)) or test_plac.y() > (y_max- (0.0002 *map_scale/10000)):
 				return GridAndLabelCreator.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck, map_scale/1000)
 
 		if label_index == 1:
@@ -483,8 +489,8 @@ class GridAndLabelCreator(object):
 		""" Labeling UTM Grid"""
 		if utmcheck:
 			dx = [-0.0027*map_scale*fSize/1.5, 0.0018*map_scale*fSize/1.5, -0.0097*map_scale*fSize/1.5, -0.0062*map_scale*fSize/1.5, -0.0046*map_scale*fSize/1.5, 0.0020*map_scale*fSize/1.5, 0.0054*map_scale*fSize/1.5, 0.0070*map_scale*fSize/1.5, 0.0061*map_scale*fSize/1.5, -0.0035*map_scale*fSize/1.5]
-			dy = [0.0025*map_scale*fSize/1.5, 0.00155*map_scale*fSize/1.5, -0.0038*map_scale*fSize/1.5, -0.0051*map_scale*fSize/1.5, -0.0005*map_scale*fSize/1.5, -0.0015*map_scale*fSize/1.5]
-			dy0 = [0.00545*map_scale*fSize/1.5, 0.004475*map_scale*fSize/1.5, -0.0069*map_scale*fSize/1.5, -0.0080*map_scale*fSize/1.5, -0.0032*map_scale*fSize/1.5, -0.0042*map_scale*fSize/1.5]
+			dy = [0.0025*map_scale*fSize/1.5, 0.00155*map_scale*fSize/1.5, -0.0017*map_scale*fSize/1.5, -0.0051*map_scale*fSize/1.5, -0.0005*map_scale*fSize/1.5, -0.0015*map_scale*fSize/1.5]
+			dy0 = [0.00545*map_scale*fSize/1.5, 0.004475*map_scale*fSize/1.5, -0.0048*map_scale*fSize/1.5, -0.0080*map_scale*fSize/1.5, -0.0032*map_scale*fSize/1.5, -0.0042*map_scale*fSize/1.5]
 			dy1 = [0.00215*map_scale*fSize/1.5, 0.0012*map_scale*fSize/1.5]
 		else:
 			map_scale_LL = scale/10
