@@ -7,12 +7,13 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsCoordinateTransform, QgsCoo
 from qgis.core import QgsRuleBasedLabeling, QgsPalLayerSettings, QgsTextFormat, QgsPropertyCollection, QgsLabelingResults, QgsLabelPosition
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
-from PyQt5.QtGui import QColor, QFont
+from qgis.PyQt.QtGui import QColor, QFont
+from qgis.PyQt.QtCore import QObject
 
 
-class GridAndLabelCreator(object):
+class GridAndLabelCreator(QObject):
 	def __init__(self, parent=None):
-		super(GridAndLabelCreator, self).__init__(parent)
+		super(GridAndLabelCreator, self).__init__()
 
 	def reset(self, layer):
 		layer_rst = layer
