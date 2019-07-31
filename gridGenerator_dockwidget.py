@@ -24,12 +24,12 @@
 
 import os
 
-from PyQt5 import QtGui, QtWidgets, uic 
-from PyQt5.QtGui import QColor, QFont
-from PyQt5.QtCore import pyqtSignal
+from qgis.PyQt import QtGui, QtWidgets, uic 
+from qgis.PyQt.QtGui import QColor, QFont
+from qgis.PyQt.QtCore import pyqtSignal
 from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox, QgsSpinBox, QgsDoubleSpinBox, QgsColorButton
 from qgis.core import QgsVectorLayer, QgsMapLayerProxyModel
-from .Gui.GridLabel import *
+from .gui.gridAndLabelCreator import *
 
 
 
@@ -49,6 +49,7 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # self.<objectname>, and you can use autoconnect slots - see
         # http://doc.qt.io/qt-5/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
+        self.gridAndLabelCreator = GridAndLabelCreator()
         self.setupUi(self)
         self.mapLayerSelection.setFilters(QgsMapLayerProxyModel.PolygonLayer)
         self.mapLayerSelection.layerChanged.connect(self.attributeSelection.setLayer)
@@ -76,7 +77,7 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         font = self.fontType.currentFont()
         fontLL = self.fontTypeLL.currentFont()
         llcolor = self.llColor.color()
-        GridAndLabelCreator.geo_test(layer, attribute, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor)
+        self.gridAndLabelCreator.geo_test(layer, attribute, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor)
 
 
     def send_reset(self):
