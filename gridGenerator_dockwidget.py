@@ -29,7 +29,7 @@ from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtCore import pyqtSignal
 from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox, QgsSpinBox, QgsDoubleSpinBox, QgsColorButton
 from qgis.core import QgsVectorLayer, QgsMapLayerProxyModel
-from .Gui.GridLabel import *
+from .gui.gridAndLabelCreator import *
 
 
 
