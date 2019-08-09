@@ -267,7 +267,12 @@
      </rect>
     </property>
     <property name="currentText">
-     <string>Xerox Sans Serif Narrow</string>
+     <string>Arial</string>
+    </property>
+    <property name="currentFont">
+     <font>
+      <family>Arial</family>
+     </font>
     </property>
    </widget>
    <widget class="QPushButton" name="resetButton">
