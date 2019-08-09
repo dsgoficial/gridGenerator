@@ -423,14 +423,15 @@ class GridAndLabelCreator(QObject):
 		py = (ymax_source-ymin_source)/(geo_number_y+1)
 
 		if grid_spacing > 0:
+			# Bottom
 			ruletest = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
 			ruletest = self.utm_grid_labeler (ruletest, xmin_UTM, ymin_UTM, 0, ymin_source, px, py, trUTMLL, trLLUTM, 1, True, 0, dy[1]+0.4*(scale)*fSize/1.5, dy0[1]+0.4*(scale)*fSize/1.5, 0, 'Top', 'Center', 'UTMBotTest', fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, range(1), geo_bb_or)
 			rulechild = ruletest.children()[0]
 			if rulechild.settings().fieldName == 'fail':
-				rangeLat = range(2, UTM_num_x+1)
+				rangeUD = range(2, UTM_num_x+1)
 			else:
 				rangeUD = range(1, UTM_num_x+1)
-			# Bottom
+
 			for u in rangeUD:
 				root_rule = self.utm_grid_labeler (root_rule, xmin_UTM, ymin_UTM, 0, ymin_source, px, py, trUTMLL, trLLUTM, u, True, 0, dy[1]+0.4*(scale)*fSize/1.5, dy0[1]+0.4*(scale)*fSize/1.5, 0, 'Top', 'Center', 'UTMBot'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeUD, geo_bb_or)
 
