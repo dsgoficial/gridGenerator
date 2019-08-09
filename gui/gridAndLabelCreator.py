@@ -193,12 +193,44 @@ class GridAndLabelCreator(QObject):
 
 		return rule
 
-	def utm_grid_labeler(self, x_UTM, y_UTM, x_geo, y_geo, px, py, trUTMLL, trLLUTM, u, isVertical, dx, dy, dyO, dy1, label_index, vAlign, hAlign, desc, fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangetest):
-		# Check if is labeling grid's vertical lines
+	def utm_grid_labeler(self, root_rule, x_UTM, y_UTM, x_geo, y_geo, px, py, trUTMLL, trLLUTM, u, isVertical, dx, dy, dyO, dy1, vAlign, hAlign, desc, fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangetest, geo_bb_or):
+		x_colec = [float(geo_bb_or.split()[2*i]) for i in range(1,5)]
+		x_colec.sort()
+		y_colec = [float(geo_bb_or.split()[2*i+1]) for i in range(1,5)]
+		y_colec.sort()
+		ang = float(geo_bb_or.split()[13])
+		if ang > 0:
+			if 'Bot' in desc:
+				x_min_test = x_colec[0]
+				x_max_test = x_colec[2]
+			elif 'Up' in desc:
+				x_min_test = x_colec[1]
+				x_max_test = x_colec[3]
+			elif 'Left' in desc:
+				y_min_test = y_colec[1]
+				y_max_test = y_colec[3]
+			elif 'Right' in desc:
+				y_min_test = y_colec[0]
+				y_max_test = y_colec[2]
+		elif ang <= 0:
+			if 'Bot' in desc:
+				x_min_test = x_colec[1]
+				x_max_test = x_colec[3]
+			elif 'Up' in desc:
+				x_min_test = x_colec[0]
+				x_max_test = x_colec[2]
+			elif 'Left' in desc:
+				y_min_test = y_colec[0]
+				y_max_test = y_colec[2]
+			elif 'Right' in desc:
+				y_min_test = y_colec[1]
+				y_max_test = y_colec[3]
 		x_min = float(geo_bound_bb.split()[1])
 		y_min = float(geo_bound_bb.split()[2])
 		x_max = float(geo_bound_bb.split()[3])
 		y_max = float(geo_bound_bb.split()[4])
+
+		# Check if is labeling grid's vertical lines
 		if isVertical:
 			# Displacing UTM Label that overlaps Geo Label
 			if utmcheck:
@@ -215,12 +247,15 @@ class GridAndLabelCreator(QObject):
 				ancY.transform(trLLUTM)
 			test = QgsPoint(((floor(x_UTM/grid_spacing)+u)*grid_spacing),y_UTM)
 			test.transform(trUTMLL)
-			if u == 1:
-				deltaDneg = 0.0014
-				deltaDpos = 0.0016
+			if u == 1 and 'Up' in desc:
+				deltaDneg = 0.0022
+				deltaDpos = 0.0011
+			elif u == 1 and 'Bot' in desc:
+				deltaDneg = 0.00125
+				deltaDpos = 0.0011
 			else:
-				deltaDneg = 0.0010
-				deltaDpos = 0.0015
+				deltaDneg = 0.00095
+				deltaDpos = 0.0011
 			testif = abs(floor(abs(round(test.x(), 4) - (x_min % (px)) - (deltaDneg*(fSize/1.5) *scale/10))/px) - floor(abs(round(test.x(), 4) - (x_min % (px)) + (deltaDpos*(fSize/1.5) *scale/10))/px))
 			if testif >= 1:
 				ancY = QgsPoint(ancY.x(),ancY.y()+dyO)
@@ -231,8 +266,10 @@ class GridAndLabelCreator(QObject):
 				ancY.transform(trUTMLL)
 			y =ancY.y()
 			full_label = str((floor(x_UTM/grid_spacing)+u)*grid_spacing)
-			if test_plac.x() < (x_min + (0.0005 *scale/10)) or test_plac.x() > (x_max - (0.0005 *scale/10)):
-				return self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
+			if test_plac.x() < (x_min_test + (0.0005 *scale/10)) or test_plac.x() > (x_max_test - (0.0005 *scale/10)):
+				rule_fake = self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, 'fail', trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
+				root_rule.appendChild(rule_fake)
+				return root_rule
 
 		# Labeling grid's horizontal lines
 		else:
@@ -267,50 +304,35 @@ class GridAndLabelCreator(QObject):
 			x = ancX.x() + dx0
 			y = ancY.y()
 			full_label = str((floor(y_UTM/grid_spacing)+u)*grid_spacing)
-			if test_plac.y() < (y_min + (0.0002 *scale/10)) or test_plac.y() > (y_max- (0.0002 *scale/10)):
-				return self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, '', trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
+			if test_plac.y() < (y_min_test + (0.0002 *scale/10)) or test_plac.y() > (y_max_test- (0.0002 *scale/10)):
+				rule_fake = self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, 'fail', trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
+				root_rule.appendChild(rule_fake)
+				return root_rule
 
-		if label_index == 1:
-			expression_str = full_label[ : -5]
-			fontType.setWeight(50)
-		elif label_index == 2:
-			expression_str = str('\'')+full_label[-5 : -3]+str('\'')
-			fSize = fSize*5/3
-			fontType.setWeight(57)
-			if len(expression_str) == 3:
-				hAlign = 'Left'
-		elif label_index == 3:
-			expression_str = str('\'')+full_label[-3 : ]+str('\'')
-			if u == min(rangetest) and (('Bot' in desc) or ('Left' in desc)):
-				expression_str =str('\'')+full_label[-3 : ]+str('m\'')
-			fontType.setWeight(50)
-		elif label_index == 4:
-			expression_str = ''
-			if u == min(rangetest):
-				expression_str = '\'N\''
-				if isVertical:
-					expression_str = '\'E\''
-				fSize = fSize*5/3
-				fontType.setWeight(57)
+		ctrl_uni = {0:u'\u2070',1:u'\u00B9',2:u'\u00B2',3:u'\u00B3',4:u'\u2074',5:u'\u2075',6:u'\u2076',7:u'\u2077',8:u'\u2078',9:u'\u2079','m':u'\u1D50'}
+		full_label = [char for char in full_label]
+		for j in range(0,len(full_label)):
+			if not (j == len(full_label)-5 or j == len(full_label)-4):
+				full_label[j] = ctrl_uni[int(full_label[j])]
+		full_label = ''.join(full_label)
+		expression_str = str('\'') + full_label + str('\'')
+		fontType.setWeight(50)
+		fSize*=5/3
+		if u == min(rangetest) and any(spec_lbl in desc for spec_lbl in ('Bot','Left')):
+			extra_label = '  ' + 'N'
+			dyT = 0.000005*scale*fSize*(3/5)/1.5
+			dxT = 0.0000345*scale*fSize*(3/5)/1.5*(len(full_label)+5)/12
+			if isVertical:
+				extra_label = '  ' + 'E'
+				dyT = 0.000005*scale*fSize*(3/5)/1.5
+				dxT = 0.0000315*scale*fSize*(3/5)/1.5*(len(full_label)+5)/12
+			expression_str =str('\'') + full_label + extra_label + str('\'')
+			ruleUTM2 = self.grid_labeler(x+dxT, y+dyT, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc+'m', fSize, fontType, str('\'')+ctrl_uni['m']+str('\''), trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
+			root_rule.appendChild(ruleUTM2)
 
 		ruleUTM = self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, expression_str, trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
-		return ruleUTM
-
-#	def labelOverlapFix(rules, j):
-#		rlList = rules.children()
-#		for u in range(2,j+1):
-#			lblSettings = rlList[-u].settings()
-#			pos = QgsPointXY(lblSettings.Property(9), lblSettings1.Property(10))
-#			lolPos = QgsLabelingResults().labelsAtPosition(pos)
-#			dx = lblPos[0].width()
-#			lblSettingsBase = rlList[-u+1].settings()
-#			x = lblSettingsBase.Property(9)
-#			if 'Right' in rlList[-u].description:
-#				dx = -dx 
-#			datadefined = QgsPropertyCollection()
-#			datadefined.setProperty(9, x - dx)
-#			lblSettings.setDataDefinedProperties(datadefined)
-#		return rlList
+		root_rule.appendChild(ruleUTM)
+		return root_rule
 
 	def conv_dec_gms(self, base_coord, coord_spacing, u, neg_character, pos_character):
 		xbase = base_coord + coord_spacing*u
@@ -368,7 +390,7 @@ class GridAndLabelCreator(QObject):
 		#Upper
 		for u in range(0, geo_number_x+2):
 			if u ==0:
-				ruletemp = self.grid_labeler (xmin_source, ymax_source, px, py, u, 0, 0, dy[0], '', 'Center', 'Up '+str(u+1), fSize, LLfontType, str(self.conv_dec_gms(xmin_source, px, u, 'W', 'E'))+'+\'. GREENWICH\'', trLLUTM, trUTMLL, llcolor, utmcheck, scale)
+				ruletemp = self.grid_labeler (xmin_source, ymax_source, px, py, u, 0, dx[2], dy[0], '', 'Center', 'Up '+str(u+1), fSize, LLfontType, str(self.conv_dec_gms(xmin_source, px, u, 'W', 'E'))+'+\'. GREENWICH\'', trLLUTM, trUTMLL, llcolor, utmcheck, scale)
 				root_rule.appendChild(ruletemp)
 			else:
 				ruletemp = self.grid_labeler (xmin_source, ymax_source, px, py, u, 0, 0, dy[0], '', 'Center', 'Up '+str(u+1), fSize, LLfontType, self.conv_dec_gms(xmin_source, px, u, 'W', 'E'), trLLUTM, trUTMLL, llcolor, utmcheck, scale)
@@ -388,7 +410,7 @@ class GridAndLabelCreator(QObject):
 	
 		return root_rule
 
-	def utmGridlabelPlacer(self, root_rule, grid_spacing, geo_bound_bb, bound_UTM_bb, geo_number_x, geo_number_y, UTM_num_x, UTM_num_y, trUTMLL, trLLUTM, dx, dy, dy0, dy1, fSize, fontType, scale, utmcheck):
+	def utmGridlabelPlacer(self, root_rule, grid_spacing, geo_bound_bb, bound_UTM_bb, geo_number_x, geo_number_y, UTM_num_x, UTM_num_y, trUTMLL, trLLUTM, dx, dy, dy0, dy1, fSize, fontType, scale, utmcheck, geo_bb_or):
 		xmin_source = float(geo_bound_bb.split()[1])
 		ymin_source = float(geo_bound_bb.split()[2])
 		xmax_source = float(geo_bound_bb.split()[3])
@@ -401,72 +423,42 @@ class GridAndLabelCreator(QObject):
 		py = (ymax_source-ymin_source)/(geo_number_y+1)
 
 		if grid_spacing > 0:
-			ruletest = self.utm_grid_labeler (xmin_UTM, ymin_UTM, 0, ymin_source, px, py, trUTMLL, trLLUTM, 1, True,dx[0], dy[1], dy0[1], 0, 1, '', '', 'UTMBot'+'Test', fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, range(1))
-			if ruletest.settings().fieldName == '':
-				rangeUD = range(2, UTM_num_x+1)
-				ruletemp = self.utm_grid_labeler (xmin_UTM, ymax_UTM, 0, ymax_source, px, py, trUTMLL, trLLUTM, 1, True, dx[0], dy[0], dy0[0], 0, 1, 'Bottom', '', 'UTMUp'+str(1), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, range(1))
-				root_rule.appendChild(ruletemp)
-				ruletemp = self.utm_grid_labeler (xmin_UTM, ymax_UTM, 0, ymax_source, px, py, trUTMLL, trLLUTM, 1, True, 0, dy[0]-1.3*(scale)*fSize/1.5, dy0[0]-1.3*(scale)*fSize/1.5, 0, 2, 'Bottom', 'Center', 'UTMUp'+str(1), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, range(1))
-				root_rule.appendChild(ruletemp)
-				ruletemp = self.utm_grid_labeler (xmin_UTM, ymax_UTM, 0, ymax_source, px, py, trUTMLL, trLLUTM, 1, True, dx[1], dy[0], dy0[0], 0, 3, 'Bottom', '', 'UTMUp'+str(1), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, range(1))
-				root_rule.appendChild(ruletemp)
+			ruletest = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
+			ruletest = self.utm_grid_labeler (ruletest, xmin_UTM, ymin_UTM, 0, ymin_source, px, py, trUTMLL, trLLUTM, 1, True, 0, dy[1]+0.4*(scale)*fSize/1.5, dy0[1]+0.4*(scale)*fSize/1.5, 0, 'Top', 'Center', 'UTMBotTest', fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, range(1), geo_bb_or)
+			rulechild = ruletest.children()[0]
+			if rulechild.settings().fieldName == 'fail':
+				rangeLat = range(2, UTM_num_x+1)
 			else:
 				rangeUD = range(1, UTM_num_x+1)
+			# Bottom
 			for u in rangeUD:
-				# Upper
-				ruletemp = self.utm_grid_labeler (xmin_UTM, ymax_UTM, 0, ymax_source, px, py, trUTMLL, trLLUTM, u, True, dx[0], dy[0], dy0[0], 0, 1, 'Bottom', '', 'UTMUp'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeUD)
-				root_rule.appendChild(ruletemp)
-				ruletemp = self.utm_grid_labeler (xmin_UTM, ymax_UTM, 0, ymax_source, px, py, trUTMLL, trLLUTM, u, True, 0, dy[0]-1.3*(scale)*fSize/1.5, dy0[0]-1.3*(scale)*fSize/1.5, 0, 2, 'Bottom', 'Center', 'UTMUp'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeUD)
-				root_rule.appendChild(ruletemp)
-				ruletemp = self.utm_grid_labeler (xmin_UTM, ymax_UTM, 0, ymax_source, px, py, trUTMLL, trLLUTM, u, True, dx[1], dy[0], dy0[0], 0, 3, 'Bottom', '', 'UTMUp'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeUD)
-				root_rule.appendChild(ruletemp)
-				# Bottom
-				ruletemp = self.utm_grid_labeler (xmin_UTM, ymin_UTM, 0, ymin_source, px, py, trUTMLL, trLLUTM, u, True,dx[0], dy[1], dy0[1], 0, 1, 'Top', '', 'UTMBot'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeUD)
-				root_rule.appendChild(ruletemp)
-				ruletemp = self.utm_grid_labeler (xmin_UTM, ymin_UTM, 0, ymin_source, px, py, trUTMLL, trLLUTM, u, True, 0, dy[1]+0.4*(scale)*fSize/1.5, dy0[1]+0.4*(scale)*fSize/1.5, 0, 2, 'Top', 'Center', 'UTMBot'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeUD)
-				root_rule.appendChild(ruletemp)
-				ruletemp = self.utm_grid_labeler (xmin_UTM, ymin_UTM, 0, ymin_source, px, py, trUTMLL, trLLUTM, u, True, dx[1], dy[1], dy0[1], 0, 3, 'Top', '', 'UTMBot'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeUD)
-				root_rule.appendChild(ruletemp)
-				ruletemp = self.utm_grid_labeler (xmin_UTM, ymin_UTM, 0, ymin_source, px, py, trUTMLL, trLLUTM, u, True, dx[8], dy[1]+0.4*(scale)*fSize/1.5, dy0[1]+0.4*(scale)*fSize/1.5, 0, 4, 'Top', '', 'UTMBot'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeUD)
-				root_rule.appendChild(ruletemp)
+				root_rule = self.utm_grid_labeler (root_rule, xmin_UTM, ymin_UTM, 0, ymin_source, px, py, trUTMLL, trLLUTM, u, True, 0, dy[1]+0.4*(scale)*fSize/1.5, dy0[1]+0.4*(scale)*fSize/1.5, 0, 'Top', 'Center', 'UTMBot'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeUD, geo_bb_or)
 
-			ruletest = self.utm_grid_labeler (xmin_UTM, ymin_UTM, xmin_source, 0, px, py, trUTMLL, trLLUTM, 1, False, dx[2]-3.0*scale*fSize/1.5, dy[2], dy0[2], dy1[0], 1, '', '', 'UTMLeft'+'Test', fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, range(1))
-			if ruletest.settings().fieldName == '':
+			# Upper
+			rangeUD = range(1, UTM_num_x+1)
+			for u in rangeUD:
+				root_rule = self.utm_grid_labeler (root_rule, xmin_UTM, ymax_UTM, 0, ymax_source, px, py, trUTMLL, trLLUTM, u, True, 0, dy[0]-1.3*(scale)*fSize/1.5, dy0[0]-1.3*(scale)*fSize/1.5, 0, 'Bottom', 'Center', 'UTMUp'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeUD, geo_bb_or)
+
+			# Left
+			ruletest = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
+			ruletest = self.utm_grid_labeler (ruletest, xmin_UTM, ymin_UTM, xmin_source, 0, px, py, trUTMLL, trLLUTM, 1, False, dx[2]-3.1*scale*fSize/1.5, dy[3], dy0[3], dy1[1], 'Bottom', 'Center', 'UTMLeftTest', fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, range(1), geo_bb_or)
+			rulechild = ruletest.children()[0]
+			if rulechild.settings().fieldName == 'fail':
 				rangeLat = range(2, UTM_num_y+1)
-				ruletemp = self.utm_grid_labeler (xmax_UTM, ymin_UTM, xmax_source, 0, px, py, trUTMLL, trLLUTM, 1, False, dx[5], dy[2], dy0[2], dy1[0], 1, '', '', 'UTMRight'+str(1), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, range(1))
-				root_rule.appendChild(ruletemp)
-				ruletemp = self.utm_grid_labeler (xmax_UTM, ymin_UTM, xmax_source, 0, px, py, trUTMLL, trLLUTM, 1, False, dx[6], dy[3], dy0[3], dy1[1], 2, '', 'Center', 'UTMRight'+str(1), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, range(1))
-				root_rule.appendChild(ruletemp)
-				ruletemp = self.utm_grid_labeler (xmax_UTM, ymin_UTM, xmax_source, 0, px, py, trUTMLL, trLLUTM, 1, False, dx[7], dy[2], dy0[2], dy1[0], 3, '', '', 'UTMRight'+str(1), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, range(1))
-				root_rule.appendChild(ruletemp)
 			else:
 				rangeLat = range(1, UTM_num_y+1)
 			for u in rangeLat:
-				# Left
-				if u == min(rangeLat):
-					ruletemp = self.utm_grid_labeler (xmin_UTM, ymin_UTM, xmin_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[2]-3.1*scale*fSize/1.5, dy[2], dy0[2], dy1[0], 1, 'Bottom', '', 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat)
-					root_rule.appendChild(ruletemp)
-					ruletemp = self.utm_grid_labeler (xmin_UTM, ymin_UTM, xmin_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[3]-3.1*scale*fSize/1.5, dy[3], dy0[3], dy1[1], 2, 'Bottom', 'Center', 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat)
-					root_rule.appendChild(ruletemp)
-					ruletemp = self.utm_grid_labeler (xmin_UTM, ymin_UTM, xmin_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[4]-3.1*scale*fSize/1.5, dy[2], dy0[2], dy1[0], 3, 'Bottom', '', 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat)
-					root_rule.appendChild(ruletemp)
-					ruletemp = self.utm_grid_labeler (xmin_UTM, ymin_UTM, xmin_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[9], dy[3], dy0[3], dy1[1], 4, 'Bottom', '', 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat)
-					root_rule.appendChild(ruletemp)
+				if u==min(rangeLat): 
+					extra_dist = -3.1*scale*fSize/1.5
 				else:
-					ruletemp = self.utm_grid_labeler (xmin_UTM, ymin_UTM, xmin_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[2], dy[2], dy0[2], dy1[0], 1, 'Bottom', '', 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat)
-					root_rule.appendChild(ruletemp)
-					ruletemp = self.utm_grid_labeler (xmin_UTM, ymin_UTM, xmin_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[3], dy[3], dy0[3], dy1[1], 2, 'Bottom', 'Center', 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat)
-					root_rule.appendChild(ruletemp)
-					ruletemp = self.utm_grid_labeler (xmin_UTM, ymin_UTM, xmin_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[4], dy[2], dy0[2], dy1[0], 3, 'Bottom', '', 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat)
-					root_rule.appendChild(ruletemp)
-				# Right
-				ruletemp = self.utm_grid_labeler (xmax_UTM, ymin_UTM, xmax_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[5], dy[2], dy0[2], dy1[0], 1, 'Bottom', '', 'UTMRight'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat)
-				root_rule.appendChild(ruletemp)
-				ruletemp = self.utm_grid_labeler (xmax_UTM, ymin_UTM, xmax_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[6], dy[3], dy0[3], dy1[1], 2, 'Bottom', 'Center', 'UTMRight'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat)
-				root_rule.appendChild(ruletemp)
-				ruletemp = self.utm_grid_labeler (xmax_UTM, ymin_UTM, xmax_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[7], dy[2], dy0[2], dy1[0], 3, 'Bottom', '', 'UTMRight'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat)
-				root_rule.appendChild(ruletemp)
-		
+					extra_dist = 0
+				root_rule = self.utm_grid_labeler (root_rule, xmin_UTM, ymin_UTM, xmin_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[2]+extra_dist, dy[3], dy0[3], dy1[1], 'Bottom', 'Center', 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat, geo_bb_or)
+			
+			# Right
+			rangeLat = range(1, UTM_num_y+1)
+			for u in rangeLat:
+				root_rule = self.utm_grid_labeler (root_rule, xmax_UTM, ymin_UTM, xmax_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[3], dy[3], dy0[3], dy1[1], '', 'Center', 'UTMRight'+str(1), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat, geo_bb_or)
+			
 		return root_rule
 
 	def styleCreator(self, layer, index, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor, utmcheck):
@@ -496,11 +488,14 @@ class GridAndLabelCreator(QObject):
 			feature_geometry.transform(transform_feature)
 			bound_sourcecrs = 'EPSG:4674'
 			feature_bbox = feature_geometry.boundingBox()
+			feature_bbox_or = feature_geometry.orientedMinimumBoundingBox()
 		else:
 			feature_geometry = feature_bound.geometry()
 			bound_sourcecrs = layer_bound.crs().authid()
 			feature_bbox = feature_geometry.boundingBox()
+			feature_bbox_or = feature_geometry.orientedMinimumBoundingBox()
 		geo_bound_bb = str(feature_bbox).replace(',','').replace('>','')
+		oriented_geo_bb = str(feature_bbox_or).replace(',','').replace('>','').replace('((','').replace('))','')
 
 		#Defining CRSs Transformations
 		inom = feature_bound[index]
@@ -568,17 +563,17 @@ class GridAndLabelCreator(QObject):
 
 		""" Labeling Geo Grid """
 		if utmcheck:
-			dx = [2*scale*fSize/1.5, -13.6*scale*fSize/1.5]
+			dx = [2*scale*fSize/1.5, -13.6*scale*fSize/1.5, 6*scale*fSize/1.5]
 			dy = [1.7*scale*fSize/1.5, -3.8*scale*fSize/1.5]
 		else:
-			dx = [0.000018*scale, -0.000120*scale]
+			dx = [0.000018*scale, -0.000120*scale, 0.00005*scale]
 			dy = [0.000015*scale, -0.000040*scale]
 
 		root_rule = self.geoGridlabelPlacer(geo_bound_bb, geo_number_x, geo_number_y, dx, dy, fSize, LLfontType, trLLUTM, trUTMLL, llcolor, utmcheck, scale)
 
 		""" Labeling UTM Grid"""
 		if utmcheck:
-			dx = [-2.7, 1.8, -9.7, -6.2, -4.6, 2, 5.4, 7.0, 6.1, -3.5]
+			dx = [-2.7, -9.7, -6.2, 5.4]
 			dx = [i*scale*fSize/1.5 for i in dx]
 			dy = [2.5, -1.7, -0.5, -1.5]
 			dy = [i*scale*fSize/1.5 for i in dy]
@@ -587,16 +582,16 @@ class GridAndLabelCreator(QObject):
 			dy1 = [2.15, 1.2]
 			dy1 = [i*scale*fSize/1.5 for i in dy1]
 		else:
-			dx = [-0.00003, 0.000018, -0.000107, -0.000070, -0.000053, 0.000023, 0.000060, 0.000079]
+			dx = [-0.00003, -0.000107, -0.000070, 0.000060]
 			dx = [i*scale*fSize/1.5 for i in dx]
-			dy = [0.000027, 0.000016, -0.000041, -0.000052, -0.000003, -0.000015]
+			dy = [0.000027, 0.000016, -0.000041, -0.000052]
 			dy = [i*scale*fSize/1.5 for i in dy]
-			dy0 = [0.0000644, 0.000053, -0.000076, -0.000087, 0.000064, 0.000052]
+			dy0 = [0.0000644, 0.000053, -0.000076, -0.000087]
 			dy0 = [i*scale*fSize/1.5 for i in dy0]
 			dy1 = [0.000032, 0.000020]
 			dy1 = [i*scale*fSize/1.5 for i in dy1]
 
-		root_rule = self.utmGridlabelPlacer(root_rule, grid_spacing, geo_bound_bb, bound_UTM_bb, geo_number_x, geo_number_y, UTM_num_x, UTM_num_y, trUTMLL, trLLUTM, dx, dy, dy0, dy1, fSize, fontType, scale, utmcheck)
+		root_rule = self.utmGridlabelPlacer(root_rule, grid_spacing, geo_bound_bb, bound_UTM_bb, geo_number_x, geo_number_y, UTM_num_x, UTM_num_y, trUTMLL, trLLUTM, dx, dy, dy0, dy1, fSize, fontType, scale, utmcheck, oriented_geo_bb)
 
 		""" Activating Labels """
 		rules = QgsRuleBasedLabeling(root_rule)
