@@ -317,20 +317,29 @@ class GridAndLabelCreator(QObject):
 		full_label = ''.join(full_label)
 		expression_str = str('\'') + full_label + str('\'')
 		fontType.setWeight(50)
-		fSize*=5/3
+		fSizeAlt = fSize * 5/3
 		if u == min(rangetest) and any(spec_lbl in desc for spec_lbl in ('Bot','Left')):
 			extra_label = '  ' + 'N'
-			dyT = 0.000005*scale*fSize*(3/5)/1.5
-			dxT = 0.0000345*scale*fSize*(3/5)/1.5*(len(full_label)+5)/12
+			dyT = 0.5*scale*fSize/1.5
+			if len(expression_str) == 9:
+				dxT = 3.5*scale*fSize/1.5
+			elif len(expression_str) == 6:
+				dxT = 1.5*scale*fSize/1.5
+			elif len(expression_str) == 7:
+				dxT = 2.5*scale*fSize/1.5
 			if isVertical:
 				extra_label = '  ' + 'E'
-				dyT = 0.000005*scale*fSize*(3/5)/1.5
-				dxT = 0.0000315*scale*fSize*(3/5)/1.5*(len(full_label)+5)/12
+				dyT = 0.5*scale*fSize/1.5
+				dxT = 3.0*scale*fSize/1.5
 			expression_str =str('\'') + full_label + extra_label + str('\'')
-			ruleUTM2 = self.grid_labeler(x+dxT, y+dyT, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc+'m', fSize, fontType, str('\'')+ctrl_uni['m']+str('\''), trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
+			plac_m = QgsPoint(x,y)
+			plac_m.transform(trLLUTM)
+			plac_new = QgsPoint(plac_m.x()+dxT,plac_m.y()+dyT)
+			plac_new.transform(trUTMLL)
+			ruleUTM2 = self.grid_labeler(plac_new.x(), plac_new.y(), 0, 0, 0, 0, 0, 0, vAlign, 'Center', desc+'m', fSizeAlt, fontType, str('\'')+ctrl_uni['m']+str('\''), trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
 			root_rule.appendChild(ruleUTM2)
 
-		ruleUTM = self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, expression_str, trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
+		ruleUTM = self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSizeAlt, fontType, expression_str, trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
 		root_rule.appendChild(ruleUTM)
 		return root_rule
 
@@ -450,7 +459,7 @@ class GridAndLabelCreator(QObject):
 				rangeLat = range(1, UTM_num_y+1)
 			for u in rangeLat:
 				if u==min(rangeLat): 
-					extra_dist = -3.1*scale*fSize/1.5
+					extra_dist = -2.0*scale*fSize/1.5
 				else:
 					extra_dist = 0
 				root_rule = self.utm_grid_labeler (root_rule, xmin_UTM, ymin_UTM, xmin_source, 0, px, py, trUTMLL, trLLUTM, u, False, dx[2]+extra_dist, dy[3], dy0[3], dy1[1], 'Bottom', 'Center', 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, utmcheck, geo_bound_bb, rangeLat, geo_bb_or)
