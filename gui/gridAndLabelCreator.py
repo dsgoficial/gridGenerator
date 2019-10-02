@@ -348,7 +348,7 @@ class GridAndLabelCreator(QObject):
         x = abs(xbase)
         xdeg = floor(round(x,4))
         xmin = floor(round(((x - xdeg)*60),4))
-        xseg = floor(round(((x - xdeg - xmin/60)*60),4))
+        xseg = floor(round(((x - xdeg - xmin/60)*3600),4))
         if xbase < 0:
             xhem = neg_character
         else:
