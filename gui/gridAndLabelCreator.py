@@ -346,9 +346,9 @@ class GridAndLabelCreator(QObject):
     def conv_dec_gms(self, base_coord, coord_spacing, u, neg_character, pos_character):
         xbase = base_coord + coord_spacing*u
         x = abs(xbase)
-        xdeg = floor(round(x,4))
-        xmin = floor(round(((x - xdeg)*60),4))
-        xseg = floor(round(((x - xdeg - xmin/60)*3600),4))
+        xdeg = int(x)
+        xmin = int((x - xdeg)*60)
+        xseg = int(round(((x - xdeg - xmin/60)*3600),0))
         if xbase < 0:
             xhem = neg_character
         else:
