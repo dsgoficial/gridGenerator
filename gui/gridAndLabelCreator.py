@@ -54,6 +54,7 @@ class GridAndLabelCreator(QObject):
         symb = QgsGeometryGeneratorSymbolLayer.create(properties)
         symb.setSymbolType(1)
         symb.setSubSymbol(line_temp)
+        
         symb.setGeometryExpression('make_line(make_point('+str(p1.x())+',('+str(p1.y())+')),make_point('+str(p2.x())+',('+str(p2.y())+')))')
         return symb
 
@@ -266,7 +267,7 @@ class GridAndLabelCreator(QObject):
                 ancY.transform(trUTMLL)
             y =ancY.y()
             full_label = str((floor(x_UTM/grid_spacing)+u)*grid_spacing)
-            if test_plac.x() < (x_min_test + (0.0005 * scale/10)) or test_plac.x() > (x_max_test - (0.0005 * scale/10)):
+            if test_plac.x() < (x_min_test) or test_plac.x() > (x_max_test):
                 rule_fake = self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSize, fontType, 'fail', trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
                 root_rule.appendChild(rule_fake)
                 return root_rule
@@ -320,7 +321,7 @@ class GridAndLabelCreator(QObject):
         fSizeAlt = fSize * 5/3
         if u == min(rangetest) and any(spec_lbl in desc for spec_lbl in ('Bot','Left')):
             extra_label = '  ' + 'N'
-            dyT = 0.5*scale*fSize/1.5
+            dyT = 2.0*scale*fSize/1.5
             if len(expression_str) == 9:
                 dxT = 3.5*scale*fSize/1.5
             elif len(expression_str) == 6:
@@ -329,16 +330,15 @@ class GridAndLabelCreator(QObject):
                 dxT = 2.5*scale*fSize/1.5
             if isVertical:
                 extra_label = '  ' + 'E'
-                dyT = 0.5*scale*fSize/1.5
+                dyT = 0.15*scale*fSize/1.5
                 dxT = 3.0*scale*fSize/1.5
             expression_str =str('\'') + full_label + extra_label + str('\'')
             plac_m = QgsPoint(x,y)
             plac_m.transform(trLLUTM)
             plac_new = QgsPoint(plac_m.x()+dxT,plac_m.y()+dyT)
             plac_new.transform(trUTMLL)
-            ruleUTM2 = self.grid_labeler(plac_new.x(), plac_new.y(), 0, 0, 0, 0, 0, 0, vAlign, 'Center', desc+'m', fSizeAlt, fontType, str('\'')+ctrl_uni['m']+str('\''), trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
+            ruleUTM2 = self.grid_labeler(plac_new.x(), plac_new.y(), 0, 0, 0, 0, 0, 0, vAlign, 'Center', desc+'m', fSize*4/5, fontType, str('\'m\''), trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
             root_rule.appendChild(ruleUTM2)
-
         ruleUTM = self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, vAlign, hAlign, desc, fSizeAlt, fontType, expression_str, trLLUTM, trUTMLL, QColor('black'), utmcheck, scale)
         root_rule.appendChild(ruleUTM)
         return root_rule
@@ -347,8 +347,8 @@ class GridAndLabelCreator(QObject):
         xbase = base_coord + coord_spacing*u
         x = abs(xbase)
         xdeg = int(x)
-        xmin = int((x - xdeg)*60)
-        xseg = int(round(((x - xdeg - xmin/60)*3600),0))
+        xmin = int(((x - xdeg)*60))
+        xseg = int(((x - xdeg - xmin/60)*3600))
         if xbase < 0:
             xhem = neg_character
         else:
