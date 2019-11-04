@@ -255,7 +255,7 @@ class GridAndLabelCreator(QObject):
                 deltaDneg = 0.00125
                 deltaDpos = 0.0011
             else:
-                deltaDneg = 0.00095
+                deltaDneg = 0.0011
                 deltaDpos = 0.0011
             testif = abs(floor(abs(round(test.x(), 4) - (x_min % (px)) - (deltaDneg*(fSize/1.5) *scale/10))/px) - floor(abs(round(test.x(), 4) - (x_min % (px)) + (deltaDpos*(fSize/1.5) *scale/10))/px))
             if testif >= 1:
@@ -343,9 +343,20 @@ class GridAndLabelCreator(QObject):
         root_rule.appendChild(ruleUTM)
         return root_rule
 
-    def conv_dec_gms(self, base_coord, coord_spacing, u, neg_character, pos_character):
+    def conv_dec_gms(self, base_coord, u, neg_character, pos_character, geo_bound_bb, isVertical, geo_number_x, geo_number_y):
+        xmin_source = float(geo_bound_bb.split()[1])
+        ymin_source = float(geo_bound_bb.split()[2])
+        xmax_source = float(geo_bound_bb.split()[3])
+        ymax_source = float(geo_bound_bb.split()[4])
+        if isVertical:
+            coord_spacing = (round(ymax_source,6) - round(ymin_source,6))/(geo_number_y+1)
+        else:
+            coord_spacing = (round(xmax_source,6) - round(xmin_source,6))/(geo_number_x+1)
         xbase = base_coord + coord_spacing*u
-        x = abs(xbase)
+        if isVertical:
+            x = abs(((round(ymax_source,6) - round(ymin_source,6))/(geo_number_y+1))*round(xbase/((round(ymax_source,6) - round(ymin_source,6))/(geo_number_y+1))))
+        else:
+            x = abs(((round(xmax_source,6) - round(xmin_source,6))/(geo_number_x+1))*round(xbase/((round(xmax_source,6) - round(xmin_source,6))/(geo_number_x+1))))
         xdeg = int(x)
         xmin = int(((x - xdeg)*60))
         xseg = int(((x - xdeg - xmin/60)*3600))
@@ -390,31 +401,31 @@ class GridAndLabelCreator(QObject):
         ymin_source = float(geo_bound_bb.split()[2])
         xmax_source = float(geo_bound_bb.split()[3])
         ymax_source = float(geo_bound_bb.split()[4])
-    
-        px = (xmax_source-xmin_source)/(geo_number_x+1)
-        py = (ymax_source-ymin_source)/(geo_number_y+1)
-    
+
+        px = (round(xmax_source,6) - round(xmin_source,6))/(geo_number_x+1)
+        py = (round(ymax_source,6) - round(ymin_source,6))/(geo_number_y+1)
+
         root_rule = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
     
         #Upper
         for u in range(0, geo_number_x+2):
             if u ==0:
-                ruletemp = self.grid_labeler (xmin_source, ymax_source, px, py, u, 0, dx[2], dy[0], '', 'Center', 'Up '+str(u+1), fSize, LLfontType, str(self.conv_dec_gms(xmin_source, px, u, 'W', 'E'))+'+\'. GREENWICH\'', trLLUTM, trUTMLL, llcolor, utmcheck, scale)
+                ruletemp = self.grid_labeler (xmin_source, ymax_source, px, py, u, 0, dx[2], dy[0], '', 'Center', 'Up '+str(u+1), fSize, LLfontType, str(self.conv_dec_gms(xmin_source, u, 'W', 'E', geo_bound_bb, True, geo_number_x, geo_number_y))+'+\'. GREENWICH\'', trLLUTM, trUTMLL, llcolor, utmcheck, scale)
                 root_rule.appendChild(ruletemp)
             else:
-                ruletemp = self.grid_labeler (xmin_source, ymax_source, px, py, u, 0, 0, dy[0], '', 'Center', 'Up '+str(u+1), fSize, LLfontType, self.conv_dec_gms(xmin_source, px, u, 'W', 'E'), trLLUTM, trUTMLL, llcolor, utmcheck, scale)
+                ruletemp = self.grid_labeler (xmin_source, ymax_source, px, py, u, 0, 0, dy[0], '', 'Center', 'Up '+str(u+1), fSize, LLfontType, self.conv_dec_gms(xmin_source, u, 'W', 'E', geo_bound_bb, True, geo_number_x, geo_number_y), trLLUTM, trUTMLL, llcolor, utmcheck, scale)
                 root_rule.appendChild(ruletemp)
         #Bottom
         for b in range(0, geo_number_x+2):
-            ruletemp = self.grid_labeler (xmin_source, ymin_source, px, py, b, 0, 0, dy[1], '', 'Center', 'Bot '+str(b+1), fSize, LLfontType, self.conv_dec_gms(xmin_source, px, b, 'W', 'E'), trLLUTM, trUTMLL, llcolor,  utmcheck, scale)
+            ruletemp = self.grid_labeler (xmin_source, ymin_source, px, py, b, 0, 0, dy[1], '', 'Center', 'Bot '+str(b+1), fSize, LLfontType, self.conv_dec_gms(xmin_source, b, 'W', 'E', geo_bound_bb, True, geo_number_x, geo_number_y), trLLUTM, trUTMLL, llcolor,  utmcheck, scale)
             root_rule.appendChild(ruletemp)
         #Right
         for r in range(0, geo_number_y+2):
-            ruletemp = self.grid_labeler (xmax_source, ymin_source, px, py, 0, r, dx[0], 0, 'Half', '', 'Right '+str(r+1), fSize, LLfontType, self.conv_dec_gms(ymin_source, py, r, 'S', 'N'), trLLUTM, trUTMLL, llcolor, utmcheck, scale)
+            ruletemp = self.grid_labeler (xmax_source, ymin_source, px, py, 0, r, dx[0], 0, 'Half', '', 'Right '+str(r+1), fSize, LLfontType, self.conv_dec_gms(ymin_source, r, 'S', 'N', geo_bound_bb, False, geo_number_x, geo_number_y), trLLUTM, trUTMLL, llcolor, utmcheck, scale)
             root_rule.appendChild(ruletemp)
         #Left
         for l in range(0, geo_number_y+2):
-            ruletemp = self.grid_labeler (xmin_source, ymin_source, px, py, 0, l, dx[1], 0, 'Half', '', 'Left '+str(l+1), fSize, LLfontType, self.conv_dec_gms(ymin_source, py, l, 'S', 'N'), trLLUTM, trUTMLL, llcolor, utmcheck, scale)
+            ruletemp = self.grid_labeler (xmin_source, ymin_source, px, py, 0, l, dx[1], 0, 'Half', '', 'Left '+str(l+1), fSize, LLfontType, self.conv_dec_gms(ymin_source, l, 'S', 'N', geo_bound_bb, False, geo_number_x, geo_number_y), trLLUTM, trUTMLL, llcolor, utmcheck, scale)
             root_rule.appendChild(ruletemp)
     
         return root_rule
