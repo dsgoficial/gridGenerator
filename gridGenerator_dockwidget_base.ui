@@ -6,388 +6,545 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>432</width>
-    <height>542</height>
+    <width>401</width>
+    <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>GridGenerator</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
-   <widget class="QgsFieldComboBox" name="attributeSelection">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>40</y>
-      <width>201</width>
-      <height>21</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="selectLayer">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>10</y>
-      <width>31</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Layer</string>
-    </property>
-   </widget>
-   <widget class="QgsMapLayerComboBox" name="mapLayerSelection">
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
-      <width>191</width>
-      <height>21</height>
+      <y>0</y>
+      <width>384</width>
+      <height>351</height>
      </rect>
     </property>
-    <property name="showCrs">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="gridColorLabel">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>280</y>
-      <width>51</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Grid Color</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="numberCrossesY">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>140</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Number of Crosses Y</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="okButton">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>470</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>OK</string>
-    </property>
-   </widget>
-   <widget class="QgsDoubleSpinBox" name="labelFontSize">
-    <property name="geometry">
-     <rect>
-      <x>268</x>
-      <y>410</y>
-      <width>82</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="value">
-     <double>1.500000000000000</double>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelFont">
-    <property name="geometry">
-     <rect>
-      <x>112</x>
-      <y>340</y>
-      <width>61</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Labels' Font</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="utmSpacingLabel">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>140</y>
-      <width>91</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>UTM Grid Spacing</string>
-    </property>
-   </widget>
-   <widget class="QgsColorButton" name="gridColor">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>310</y>
-      <width>111</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="colorDialogTitle">
-     <string>Select Grid Color</string>
-    </property>
-    <property name="allowOpacity">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QgsSpinBox" name="crossesX">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>170</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="value">
-     <number>4</number>
-    </property>
-   </widget>
-   <widget class="QgsSpinBox" name="crossesY">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>170</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="value">
-     <number>4</number>
-    </property>
-   </widget>
-   <widget class="QgsSpinBox" name="utmSpacing">
-    <property name="geometry">
-     <rect>
-      <x>285</x>
-      <y>170</y>
-      <width>91</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>999999</number>
-    </property>
-    <property name="singleStep">
-     <number>1000</number>
-    </property>
-    <property name="value">
-     <number>2000</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelFontSizeLabel">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>380</y>
-      <width>111</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Labels' Font Size (mm)</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="selectAttribute">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>10</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Index Attribute</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="numberCrossesX">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>140</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Number of Crosses X</string>
-    </property>
-   </widget>
-   <widget class="QgsDoubleSpinBox" name="mapScale">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>250</y>
-      <width>121</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <double>999999.000000000000000</double>
-    </property>
-    <property name="value">
-     <double>50.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="QLabel" name="mapScaleLabel">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>220</y>
-      <width>121</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Map Scale (Thousands)</string>
-    </property>
-   </widget>
-   <widget class="QFontComboBox" name="fontType">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>370</y>
-      <width>161</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="currentText">
-     <string>Arial</string>
-    </property>
-    <property name="currentFont">
-     <font>
-      <family>Arial</family>
-     </font>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="resetButton">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>470</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Reset</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="idAttribute">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>70</y>
-      <width>61</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Id Attribute</string>
-    </property>
-   </widget>
-   <widget class="QgsFieldComboBox" name="idSelection">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>100</y>
-      <width>191</width>
-      <height>21</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="idValueLabel">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>70</y>
-      <width>41</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Id Value</string>
-    </property>
-   </widget>
-   <widget class="QgsSpinBox" name="idValue">
-    <property name="geometry">
-     <rect>
-      <x>270</x>
-      <y>100</y>
-      <width>81</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>9999999</number>
-    </property>
-    <property name="value">
-     <number>1</number>
-    </property>
-   </widget>
-   <widget class="QgsColorButton" name="llColor">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>310</y>
-      <width>111</width>
-      <height>21</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="llColorLabel">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>280</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>LatLong Label Color</string>
-    </property>
-   </widget>
-   <widget class="QFontComboBox" name="fontTypeLL">
-    <property name="geometry">
-     <rect>
-      <x>58</x>
-      <y>430</y>
-      <width>161</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="currentText">
-     <string>Arial</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelFont_2">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>400</y>
-      <width>111</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>LatLong Labels' Font</string>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMaximumSize</enum>
+     </property>
+     <item>
+      <layout class="QHBoxLayout">
+       <property name="spacing">
+        <number>1</number>
+       </property>
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMaximumSize</enum>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="selectLayer">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Layer</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="idAttribute">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Id Attribute</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_9">
+       <item>
+        <widget class="QgsMapLayerComboBox" name="mapLayerSelection">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="showCrs">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsFieldComboBox" name="idSelection">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="idValueLabel">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Id Value</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="utmSpacingLabel">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>UTM Grid Spacing</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QgsSpinBox" name="idValue">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="maximum">
+          <number>9999999</number>
+         </property>
+         <property name="value">
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsSpinBox" name="utmSpacing">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="maximum">
+          <number>999999</number>
+         </property>
+         <property name="singleStep">
+          <number>1000</number>
+         </property>
+         <property name="value">
+          <number>2000</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="numberCrossesX">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Number of Crosses X</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="numberCrossesY">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Number of Crosses Y</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QgsSpinBox" name="crossesX">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="value">
+          <number>4</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsSpinBox" name="crossesY">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="value">
+          <number>4</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QLabel" name="mapScaleLabel">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Map Scale (Thousands)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QgsDoubleSpinBox" name="mapScale">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="maximum">
+        <double>999999.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>50.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="gridColorLabel">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Grid Color</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="llColorLabel">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>LatLong Label Color</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QgsColorButton" name="gridColor">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="colorDialogTitle">
+          <string>Select Grid Color</string>
+         </property>
+         <property name="allowOpacity">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsColorButton" name="llColor">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMaximumSize</enum>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelFont">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>UTM Labels' Font Type</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelFont_2">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Geographic Labels' Font Type</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_8">
+       <item>
+        <widget class="QFontComboBox" name="fontType">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="currentText">
+          <string>Arial</string>
+         </property>
+         <property name="currentFont">
+          <font>
+           <family>Arial</family>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFontComboBox" name="fontTypeLL">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="currentText">
+          <string>Arial</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item alignment="Qt::AlignHCenter">
+      <widget class="QLabel" name="labelFontSizeLabel">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Labels' Font Size (mm)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QgsDoubleSpinBox" name="labelFontSize">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.500000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>10</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_10">
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="okButton">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>OK</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="resetButton">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Reset Style</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>

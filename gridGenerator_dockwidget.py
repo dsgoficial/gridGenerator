@@ -52,7 +52,6 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.gridAndLabelCreator = GridAndLabelCreator()
         self.setupUi(self)
         self.mapLayerSelection.setFilters(QgsMapLayerProxyModel.PolygonLayer)
-        self.mapLayerSelection.layerChanged.connect(self.attributeSelection.setLayer)
         self.mapLayerSelection.layerChanged.connect(self.idSelection.setLayer)
 
         self.okButton.pressed.connect(self.send_inputs)
@@ -61,11 +60,10 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     def send_inputs(self):
 
-        if (not self.mapLayerSelection.currentLayer()) and (self.attributeSelection.currentField()) and (self.idSelection.currentField()) and (self.idValue.value()) and (self.utmSpacing.value()) and (self.crossesX.value()) and (self.crossesY.value()) and (self.mapScale.value()) and (self.gridColor.color()) and (self.labelFontSize.value()) and (self.fontType.currentFont()) and (self.fontTypeLL.currentFont()):
+        if (not self.mapLayerSelection.currentLayer()) and (self.idSelection.currentField()) and (self.idValue.value()) and (self.utmSpacing.value()) and (self.crossesX.value()) and (self.crossesY.value()) and (self.mapScale.value()) and (self.gridColor.color()) and (self.labelFontSize.value()) and (self.fontType.currentFont()) and (self.fontTypeLL.currentFont()):
             return
 
         layer = self.mapLayerSelection.currentLayer()
-        attribute = self.attributeSelection.currentField()
         id_attr = self.idSelection.currentField()
         id_value = self.idValue.value()
         spacing = self.utmSpacing.value()
@@ -77,12 +75,12 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         font = self.fontType.currentFont()
         fontLL = self.fontTypeLL.currentFont()
         llcolor = self.llColor.color()
-        self.gridAndLabelCreator.geo_test(layer, attribute, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor)
+        self.gridAndLabelCreator.geo_test(layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor)
 
 
     def send_reset(self):
         layer = self.mapLayerSelection.currentLayer()
-        GridAndLabelCreator.reset(layer)
+        self.gridAndLabelCreator.reset(layer)
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
