@@ -32,9 +32,16 @@ class GridAndLabelCreator(QObject):
 
     def geo_test(self, layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor):
         if layer.crs().isGeographic() == False:
-            self.styleCreator(layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor)
+            testFeature = layer.getFeatures('"' + id_attr + '"' + '=' + str(id_value))
+            featureList =  [i for i in testFeature]
+            if not featureList:
+                QMessageBox.critical(None, u"Erro", u"Escolha um valor existente do atributo " + str(id_attr) + u".")
+                return            
+            else:
+                self.styleCreator(layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor)
         else:
             QMessageBox.critical(None, u"Erro", u"A camada desejada deve estar projetada.")
+            return
         pass
 
     def crossLinegenerator(self, layer_bound, x_geo, y_geo, px, py, u, t, dx, dy, trLLUTM):
