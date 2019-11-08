@@ -35,7 +35,7 @@ class GridAndLabelCreator(QObject):
             testFeature = layer.getFeatures('"' + id_attr + '"' + '=' + str(id_value))
             featureList =  [i for i in testFeature]
             if not featureList:
-                QMessageBox.critical(None, u"Erro", u"Escolha um valor existente do atributo " + str(id_attr) + u".")
+                QMessageBox.critical(None, u"Erro", u"Escolha um valor existente do atributo '%s'"%(str(id_attr)))
                 return            
             else:
                 self.styleCreator(layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor)
@@ -56,7 +56,7 @@ class GridAndLabelCreator(QObject):
         symb.setSymbolType(1)
         symb.setSubSymbol(line_temp)
         
-        symb.setGeometryExpression('transform(make_line(make_point('+str(p1.x())+',('+str(p1.y())+')),make_point('+str(p2.x())+',('+str(p2.y())+'))),  layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs)')
+        symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(p1.x(), p1.y(), p2.x(), p2.y(), layer_bound.sourceName()))
         return symb
 
     def gridLinesymbolMaker(self, x1, y1, x2, y2, xmax_geo, xmin_geo, ymax_geo, ymin_geo, trUTMLL, trLLUTM, isVertical):
@@ -99,18 +99,18 @@ class GridAndLabelCreator(QObject):
                 mid_point = test_line[0].intersection(test_grid).vertexAt(0)
                 mid_point.transform(trLLUTM)
                 if auxPointlist[0].x() > auxPointlist[1].x():
-                    symb.setGeometryExpression('transform(make_line(make_point('+str(auxPointlist[2].x())+','+str(auxPointlist[2].y())+'), make_point('+str(mid_point.x())+','+str(mid_point.y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound.sourceName()))
                 else:
-                    symb.setGeometryExpression('transform(make_line(make_point('+str(mid_point.x())+','+str(mid_point.y())+'), make_point('+str(auxPointlist[3].x())+','+str(auxPointlist[3].y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
             elif test_line[1].intersects(test_grid):
                 mid_point = test_line[1].intersection(test_grid).vertexAt(0)
                 mid_point.transform(trLLUTM)
                 if auxPointlist[0].x() < auxPointlist[1].x():
-                    symb.setGeometryExpression('transform(make_line(make_point('+str(auxPointlist[2].x())+','+str(auxPointlist[2].y())+'), make_point('+str(mid_point.x())+','+str(mid_point.y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound.sourceName()))
                 else:
-                    symb.setGeometryExpression('transform(make_line(make_point('+str(mid_point.x())+','+str(mid_point.y())+'), make_point('+str(auxPointlist[3].x())+','+str(auxPointlist[3].y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
             else:
-                symb.setGeometryExpression('transform(make_line(make_point('+str(auxPointlist[2].x())+','+str(auxPointlist[2].y())+'), make_point('+str(auxPointlist[3].x())+','+str(auxPointlist[3].y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+                symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
 
         #Horizontal
         elif (u == 1 and t == 0) or (u == UTM_num_y and t == 0):
@@ -126,29 +126,29 @@ class GridAndLabelCreator(QObject):
                 mid_point = test_line[0].intersection(test_grid).vertexAt(0)
                 mid_point.transform(trLLUTM)
                 if auxPointlist[0].y() > auxPointlist[1].y():
-                    symb.setGeometryExpression('transform(make_line(make_point('+str(auxPointlist[2].x())+','+str(auxPointlist[2].y())+'), make_point('+str(mid_point.x())+','+str(mid_point.y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound.sourceName()))
                 else:
-                    symb.setGeometryExpression('transform(make_line(make_point('+str(mid_point.x())+','+str(mid_point.y())+'), make_point('+str(auxPointlist[3].x())+','+str(auxPointlist[3].y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
             elif test_line[1].intersects(test_grid):
                 mid_point = test_line[1].intersection(test_grid).vertexAt(0)
                 mid_point.transform(trLLUTM)
                 if auxPointlist[0].y() < auxPointlist[1].y():
-                    symb.setGeometryExpression('transform(make_line(make_point('+str(auxPointlist[2].x())+','+str(auxPointlist[2].y())+'), make_point('+str(mid_point.x())+','+str(mid_point.y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound.sourceName()))
                 else:
-                    symb.setGeometryExpression('transform(make_line(make_point('+str(mid_point.x())+','+str(mid_point.y())+'), make_point('+str(auxPointlist[3].x())+','+str(auxPointlist[3].y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
             else:
-                symb.setGeometryExpression('transform(make_line(make_point('+str(auxPointlist[2].x())+','+str(auxPointlist[2].y())+'), make_point('+str(auxPointlist[3].x())+','+str(auxPointlist[3].y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+                symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
 
         #Inner Grid Lines
         #Vertical
         elif (not(t == 1)) and (not(t == UTM_num_x)) and u == 0:
             auxPointlist = self.gridLinesymbolMaker(((floor(extentsUTM[0]/grid_spacing)+t)*grid_spacing), extentsUTM[1], ((floor(extentsUTM[0]/grid_spacing)+t)*grid_spacing), extentsUTM[3], extentsGeo[2], extentsGeo[0], extentsGeo[3], extentsGeo[1], trUTMLL, trLLUTM, True)
-            symb.setGeometryExpression('transform(make_line(make_point('+str(auxPointlist[2].x())+','+str(auxPointlist[2].y())+'), make_point('+str(auxPointlist[3].x())+','+str(auxPointlist[3].y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+            symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
 
         #Horizontal
         elif (not(u == 1)) and (not(u == UTM_num_y)) and t == 0:
             auxPointlist = self.gridLinesymbolMaker(extentsUTM[0], ((floor(extentsUTM[1]/grid_spacing)+u)*grid_spacing), extentsUTM[2], ((floor(extentsUTM[1]/grid_spacing)+u)*grid_spacing), extentsGeo[2], extentsGeo[0], extentsGeo[3], extentsGeo[1], trUTMLL, trLLUTM, False)
-            symb.setGeometryExpression('transform(make_line(make_point('+str(auxPointlist[2].x())+','+str(auxPointlist[2].y())+'), make_point('+str(auxPointlist[3].x())+','+str(auxPointlist[3].y())+')), layer_property(\'' + layer_bound.sourceName() +'\', \'crs\'),  @map_crs )')
+            symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
 
         grid_symb.appendSymbolLayer(symb)
         return grid_symb
@@ -356,7 +356,7 @@ class GridAndLabelCreator(QObject):
             xhem = neg_character
         else:
             xhem = pos_character
-        conv_exp_str = '\'' + str(xdeg).rjust(2,'0') + 'º ' + str(xmin).rjust(2,'0') + str('\\') + str('\' ') + str(xseg).rjust(2,'0') + '"\'' + '+\' ' + str(xhem) + '\''
+        conv_exp_str = u"'{}º {}\\' {}\" {}'".format(str(xdeg).rjust(2,'0'), str(xmin).rjust(2,'0'), str(xseg).rjust(2,'0'), xhem)
         
         return conv_exp_str
 
