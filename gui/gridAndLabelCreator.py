@@ -188,7 +188,7 @@ class GridAndLabelCreator(QObject):
 
         return rule
 
-    def utm_grid_labeler(self, root_rule, x_UTM, y_UTM, x_geo, y_geo, x_min, y_min, px, py, trUTMLL, trLLUTM, u, isVertical, dx, dy, dyO, dy1, desc, fSize, fontType, grid_spacing, scale, extentsGeo, rangetest, geo_bb_or):
+    def utm_grid_labeler(self, root_rule, x_UTM, y_UTM, x_geo, y_geo, x_min, y_min, px, py, trUTMLL, trLLUTM, u, isVertical, dx, dy, dyO, dy1, desc, fSize, fontType, grid_spacing, scale, rangetest, geo_bb_or):
         x_colec = [float(geo_bb_or.split()[2*i]) for i in range(1,5)]
         x_colec.sort()
         y_colec = [float(geo_bb_or.split()[2*i+1]) for i in range(1,5)]
@@ -351,7 +351,7 @@ class GridAndLabelCreator(QObject):
             x = abs(((round(extentsGeo[2],6) - round(extentsGeo[0],6))/(geo_number_x+1))*round(xbase/((round(extentsGeo[2],6) - round(extentsGeo[0],6))/(geo_number_x+1))))
         xdeg = int(x)
         xmin = int(((x - xdeg)*60))
-        xseg = int(((x - xdeg - xmin/60)*3600))
+        xseg = round(((x - xdeg - xmin/60)*3600))
         if xbase < 0:
             xhem = neg_character
         else:
@@ -410,7 +410,7 @@ class GridAndLabelCreator(QObject):
         if grid_spacing > 0:
             # Bottom
             ruletest = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
-            ruletest = self.utm_grid_labeler(ruletest, extentsUTM[0], extentsUTM[1], 0, extentsGeo[1], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, 1, True, dx[0], dy[1], dy0[1], 0, 'UTMBotTest', fSize, fontType, grid_spacing, scale, extentsGeo, range(1), geo_bb_or)
+            ruletest = self.utm_grid_labeler(ruletest, extentsUTM[0], extentsUTM[1], 0, extentsGeo[1], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, 1, True, dx[0], dy[1], dy0[1], 0, 'UTMBotTest', fSize, fontType, grid_spacing, scale, range(1), geo_bb_or)
             rulechild = ruletest.children()[0]
             if rulechild.settings().fieldName == 'fail':
                 rangeUD = range(2, UTM_num_x+1)
@@ -418,16 +418,16 @@ class GridAndLabelCreator(QObject):
                 rangeUD = range(1, UTM_num_x+1)
 
             for u in rangeUD:
-                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[1], 0, extentsGeo[1], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, True, dx[0], dy[1], dy0[1]+0.4*(scale)*fSize/1.5, 0, 'UTMBot'+str(u), fSize, fontType, grid_spacing, scale, extentsGeo, rangeUD, geo_bb_or)
+                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[1], 0, extentsGeo[1], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, True, dx[0], dy[1], dy0[1]+0.4*(scale)*fSize/1.5, 0, 'UTMBot'+str(u), fSize, fontType, grid_spacing, scale, rangeUD, geo_bb_or)
 
             # Upper
             rangeUD = range(1, UTM_num_x+1)
             for u in rangeUD:
-                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[3], 0, extentsGeo[3], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, True, dx[1], dy[0], dy0[0]-1.3*(scale)*fSize/1.5, 0, 'UTMUp'+str(u), fSize, fontType, grid_spacing, scale, extentsGeo, rangeUD, geo_bb_or)
+                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[3], 0, extentsGeo[3], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, True, dx[1], dy[0], dy0[0]-1.3*(scale)*fSize/1.5, 0, 'UTMUp'+str(u), fSize, fontType, grid_spacing, scale, rangeUD, geo_bb_or)
 
             # Left
             ruletest = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
-            ruletest = self.utm_grid_labeler(ruletest, extentsUTM[0], extentsUTM[1], extentsGeo[0], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, 1, False, dx[2], dy[3], dy0[3], dy1[1], 'UTMLeftTest', fSize, fontType, grid_spacing, scale, extentsGeo, range(1), geo_bb_or)
+            ruletest = self.utm_grid_labeler(ruletest, extentsUTM[0], extentsUTM[1], extentsGeo[0], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, 1, False, dx[2], dy[3], dy0[3], dy1[1], 'UTMLeftTest', fSize, fontType, grid_spacing, scale, range(1), geo_bb_or)
             rulechild = ruletest.children()[0]
             if rulechild.settings().fieldName == 'fail':
                 rangeLat = range(2, UTM_num_y+1)
@@ -438,12 +438,12 @@ class GridAndLabelCreator(QObject):
                     extra_dist = -3.2*scale*fSize/1.5
                 else:
                     extra_dist = 0
-                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[1], extentsGeo[0], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, False, dx[2]+extra_dist, dy[3], dy0[3], dy1[1], 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, extentsGeo, rangeLat, geo_bb_or)
+                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[1], extentsGeo[0], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, False, dx[2]+extra_dist, dy[3], dy0[3], dy1[1], 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, rangeLat, geo_bb_or)
             
             # Right
             rangeLat = range(1, UTM_num_y+1)
             for u in rangeLat:
-                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[2], extentsUTM[1], extentsGeo[2], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, False, dx[3], dy[3], dy0[3], dy1[1], 'UTMRight'+str(1), fSize, fontType, grid_spacing, scale, extentsGeo, rangeLat, geo_bb_or)
+                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[2], extentsUTM[1], extentsGeo[2], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, False, dx[3], dy[3], dy0[3], dy1[1], 'UTMRight'+str(1), fSize, fontType, grid_spacing, scale, rangeLat, geo_bb_or)
             
         return root_rule
 
