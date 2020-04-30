@@ -160,7 +160,7 @@ class GridAndLabelCreator(QObject):
 
         #Label Format Settings
         settings = QgsPalLayerSettings()
-        settings.Placement = QgsPalLayerSettings.Horizontal
+        settings.placement = 1
         settings.isExpression = True
         textprop = QgsTextFormat()
         textprop.setColor(llcolor)
@@ -179,6 +179,8 @@ class GridAndLabelCreator(QObject):
         datadefined.property(20).setActive(True)
         datadefined.property(15).setExpressionString('True')
         datadefined.property(15).setActive(True)
+        datadefined.property(77).setExpressionString('2')
+        datadefined.property(77).setActive(True)
 
         #Creating and Activating Labeling Rule
         settings.setDataDefinedProperties(datadefined)
