@@ -30,6 +30,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox, QgsSpinBox, QgsDoubleSpinBox, QgsColorButton
 from qgis.core import QgsVectorLayer, QgsMapLayerProxyModel
 from .gui.gridAndLabelCreator import *
+from .gui.utmZoneSelection import *
 
 
 
@@ -51,9 +52,9 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # #widgets-and-dialogs-with-auto-connect
         self.gridAndLabelCreator = GridAndLabelCreator()
         self.setupUi(self)
+        self.iface = iface
         self.mapLayerSelection.setFilters(QgsMapLayerProxyModel.PolygonLayer)
         self.mapLayerSelection.layerChanged.connect(self.idSelection.setLayer)
-
         self.okButton.pressed.connect(self.send_inputs)
         self.resetButton.pressed.connect(self.send_reset)
 
@@ -77,8 +78,18 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         llcolor = self.llColor.color()
         linwidth_geo = self.width_geo.value()
         linwidth_utm = self.width_utm.value()
-        self.gridAndLabelCreator.geo_test(layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm)
-
+        if layer == None:
+            QMessageBox.information(self, u"Aviso", u"Nenhuma camada selecionada.\nSelecione uma camada vetorial poligonal para gerar o grid.")
+            return
+        else:
+            testFeature = layer.getFeatures('"' + id_attr + '"' + '=' + str(id_value))
+            featureList =  [i for i in testFeature]
+            if not featureList:
+                QMessageBox.critical(None, u"Erro", u"Escolha um valor existente do atributo '%s'"%(str(id_attr)))
+                return            
+            else:
+                dialogUTMZoneSelection = UTMZoneSelection(self.iface, layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm)
+                dialogUTMZoneSelection.exec_()
 
     def send_reset(self):
         layer = self.mapLayerSelection.currentLayer()

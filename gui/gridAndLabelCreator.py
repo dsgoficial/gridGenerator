@@ -30,21 +30,7 @@ class GridAndLabelCreator(QObject):
         layer_rst.triggerRepaint()
         return
 
-    def geo_test(self, layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm):
-        if layer.crs().isGeographic() == False:
-            testFeature = layer.getFeatures('"' + id_attr + '"' + '=' + str(id_value))
-            featureList =  [i for i in testFeature]
-            if not featureList:
-                QMessageBox.critical(None, u"Erro", u"Escolha um valor existente do atributo '%s'"%(str(id_attr)))
-                return            
-            else:
-                self.styleCreator(layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm)
-        else:
-            QMessageBox.critical(None, u"Erro", u"A camada desejada deve estar projetada.")
-            return
-        pass
-
-    def crossLinegenerator(self, layer_bound, x_geo, y_geo, px, py, u, t, dx, dy, trLLUTM, linwidth_geo):
+    def crossLinegenerator(self, utmSRID, x_geo, y_geo, px, py, u, t, dx, dy, trLLUTM, linwidth_geo):
         p1 = QgsPoint(x_geo+px*u, y_geo+py*t)
         p2 = QgsPoint(x_geo+px*u+dx, y_geo+py*t+dy)
         p1.transform(trLLUTM)
@@ -56,7 +42,7 @@ class GridAndLabelCreator(QObject):
         symb.setSymbolType(1)
         symb.setSubSymbol(line_temp)
         
-        symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(p1.x(), p1.y(), p2.x(), p2.y(), layer_bound.sourceName()))
+        symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), 'EPSG:{}', @map_crs)".format(p1.x(), p1.y(), p2.x(), p2.y(), utmSRID))
         return symb
 
     def gridLinesymbolMaker(self, x1, y1, x2, y2, xmax_geo, xmin_geo, ymax_geo, ymin_geo, trUTMLL, trLLUTM, isVertical):
@@ -99,18 +85,18 @@ class GridAndLabelCreator(QObject):
                 mid_point = test_line[0].intersection(test_grid).vertexAt(0)
                 mid_point.transform(trLLUTM)
                 if auxPointlist[0].x() > auxPointlist[1].x():
-                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound.sourceName()))
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), 'EPSG:{}', @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound))
                 else:
-                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), 'EPSG:{}', @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound))
             elif test_line[1].intersects(test_grid):
                 mid_point = test_line[1].intersection(test_grid).vertexAt(0)
                 mid_point.transform(trLLUTM)
                 if auxPointlist[0].x() < auxPointlist[1].x():
-                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound.sourceName()))
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})),'EPSG:{}', @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound))
                 else:
-                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})),'EPSG:{}', @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound))
             else:
-                symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
+                symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})),'EPSG:{}', @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound))
 
         #Horizontal
         elif (u == 1 and t == 0) or (u == UTM_num_y and t == 0):
@@ -126,38 +112,39 @@ class GridAndLabelCreator(QObject):
                 mid_point = test_line[0].intersection(test_grid).vertexAt(0)
                 mid_point.transform(trLLUTM)
                 if auxPointlist[0].y() > auxPointlist[1].y():
-                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound.sourceName()))
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})),'EPSG:{}', @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound))
                 else:
-                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})),'EPSG:{}', @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound))
             elif test_line[1].intersects(test_grid):
                 mid_point = test_line[1].intersection(test_grid).vertexAt(0)
                 mid_point.transform(trLLUTM)
                 if auxPointlist[0].y() < auxPointlist[1].y():
-                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound.sourceName()))
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})),'EPSG:{}', @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), mid_point.x(), mid_point.y(), layer_bound))
                 else:
-                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
+                    symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})),'EPSG:{}', @map_crs)".format(mid_point.x(), mid_point.y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound))
             else:
-                symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
+                symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})),'EPSG:{}', @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound))
 
         #Inner Grid Lines
         #Vertical
         elif (not(t == 1)) and (not(t == UTM_num_x)) and u == 0:
             auxPointlist = self.gridLinesymbolMaker(((floor(extentsUTM[0]/grid_spacing)+t)*grid_spacing), extentsUTM[1], ((floor(extentsUTM[0]/grid_spacing)+t)*grid_spacing), extentsUTM[3], extentsGeo[2], extentsGeo[0], extentsGeo[3], extentsGeo[1], trUTMLL, trLLUTM, True)
-            symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
+            symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})),'EPSG:{}', @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound))
 
         #Horizontal
         elif (not(u == 1)) and (not(u == UTM_num_y)) and t == 0:
             auxPointlist = self.gridLinesymbolMaker(extentsUTM[0], ((floor(extentsUTM[1]/grid_spacing)+u)*grid_spacing), extentsUTM[2], ((floor(extentsUTM[1]/grid_spacing)+u)*grid_spacing), extentsGeo[2], extentsGeo[0], extentsGeo[3], extentsGeo[1], trUTMLL, trLLUTM, False)
-            symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), layer_property('{}', 'crs'), @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound.sourceName()))
+            symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})),'EPSG:{}', @map_crs)".format(auxPointlist[2].x(), auxPointlist[2].y(), auxPointlist[3].x(), auxPointlist[3].y(), layer_bound))
 
         grid_symb.appendSymbolLayer(symb)
         return grid_symb
 
-    def grid_labeler(self, coord_base_x, coord_base_y, px, py, u, t, dx, dy, desc, fSize, fontType, expression_str, trLLUTM, llcolor):
+    def grid_labeler(self, coord_base_x, coord_base_y, px, py, u, t, dx, dy, desc, fSize, fontType, expression_str, trLLUTM, llcolor, layer_bound, trUTMLL):
         pgrid = QgsPoint(coord_base_x + px*u, coord_base_y + py*t)
         pgrid.transform(trLLUTM)
         pgrid = QgsPoint(pgrid.x()+ dx, pgrid.y()+ dy)
-
+        if layer_bound.crs().isGeographic() == True:
+            pgrid.transform(trUTMLL)
         #Label Format Settings
         settings = QgsPalLayerSettings()
         settings.placement = 1
@@ -173,7 +160,7 @@ class GridAndLabelCreator(QObject):
 
         #Label Position
         settings.geometryGeneratorEnabled = True
-        settings.geometryGenerator = ('make_point(' + str(pgrid.x()) + ',' + str(pgrid.y()) + ')')
+        settings.geometryGenerator = ("make_point({}, {})".format(pgrid.x(), pgrid.y()))
         datadefined = QgsPropertyCollection()
         datadefined.property(20).setExpressionString('True')
         datadefined.property(20).setActive(True)
@@ -190,7 +177,7 @@ class GridAndLabelCreator(QObject):
 
         return rule
 
-    def utm_grid_labeler(self, root_rule, x_UTM, y_UTM, x_geo, y_geo, x_min, y_min, px, py, trUTMLL, trLLUTM, u, isVertical, dx, dy, dyO, dy1, desc, fSize, fontType, grid_spacing, scale, rangetest, geo_bb_or):
+    def utm_grid_labeler(self, root_rule, x_UTM, y_UTM, x_geo, y_geo, x_min, y_min, px, py, trUTMLL, trLLUTM, u, isVertical, dx, dy, dyO, dy1, desc, fSize, fontType, grid_spacing, scale, rangetest, geo_bb_or, layer_bound):
         x_colec = [float(geo_bb_or.split()[2*i]) for i in range(1,5)]
         x_colec.sort()
         y_colec = [float(geo_bb_or.split()[2*i+1]) for i in range(1,5)]
@@ -254,7 +241,7 @@ class GridAndLabelCreator(QObject):
             y =ancY.y()
             full_label = str((floor(x_UTM/grid_spacing)+u)*grid_spacing)
             if test_plac.x() < (x_min_test) or test_plac.x() > (x_max_test):
-                rule_fake = self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, desc, fSize, fontType, 'fail', trLLUTM, QColor('black'))
+                rule_fake = self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, desc, fSize, fontType, 'fail', trLLUTM, QColor('black'), layer_bound, trUTMLL)
                 root_rule.appendChild(rule_fake)
                 return root_rule
 
@@ -287,7 +274,7 @@ class GridAndLabelCreator(QObject):
             y = ancY.y()
             full_label = str((floor(y_UTM/grid_spacing)+u)*grid_spacing)
             if test_plac.y() < (y_min_test) or test_plac.y() > (y_max_test):
-                rule_fake = self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, desc, fSize, fontType, 'fail', trLLUTM, QColor('black'))
+                rule_fake = self.grid_labeler(x, y, 0, 0, 0, 0, 0, 0, desc, fSize, fontType, 'fail', trLLUTM, QColor('black'), layer_bound, trUTMLL)
                 root_rule.appendChild(rule_fake)
                 return root_rule
 
@@ -319,9 +306,9 @@ class GridAndLabelCreator(QObject):
             plac_hem = QgsPoint(plac.x()+dxH, plac.y())
             plac_hem.transform(trUTMLL)
 
-            ruleUTM2 = self.grid_labeler(plac_new.x(), plac_new.y(), 0, 0, 0, 0, 0, 0, desc+'m', fSize*4/5, fontType, str('\'m\''), trLLUTM, QColor('black'))
+            ruleUTM2 = self.grid_labeler(plac_new.x(), plac_new.y(), 0, 0, 0, 0, 0, 0, desc+'m', fSize*4/5, fontType, str('\'m\''), trLLUTM, QColor('black'), layer_bound, trUTMLL)
             root_rule.appendChild(ruleUTM2)
-            ruleUTM3 = self.grid_labeler(plac_hem.x(), plac_hem.y(), 0, 0, 0, 0, 0, 0, desc+' '+extra_label, fSizeAlt, fontType, '\''+extra_label+'\'', trLLUTM, QColor('black'))
+            ruleUTM3 = self.grid_labeler(plac_hem.x(), plac_hem.y(), 0, 0, 0, 0, 0, 0, desc+' '+extra_label, fSizeAlt, fontType, '\''+extra_label+'\'', trLLUTM, QColor('black'), layer_bound, trUTMLL)
             root_rule.appendChild(ruleUTM3)
 
         dxS = 0
@@ -337,7 +324,7 @@ class GridAndLabelCreator(QObject):
 
         plac_size = QgsPoint(plac.x()+dxS, plac.y())
         plac_size.transform(trUTMLL)
-        ruleUTM = self.grid_labeler(plac_size.x(), plac_size.y(), 0, 0, 0, 0, 0, 0, desc, fSizeAlt, fontType, expression_str, trLLUTM, QColor('black'))
+        ruleUTM = self.grid_labeler(plac_size.x(), plac_size.y(), 0, 0, 0, 0, 0, 0, desc, fSizeAlt, fontType, expression_str, trLLUTM, QColor('black'), layer_bound, trUTMLL)
         root_rule.appendChild(ruleUTM)
         return root_rule
 
@@ -362,57 +349,57 @@ class GridAndLabelCreator(QObject):
         
         return conv_exp_str
 
-    def geoGridcreator(self, layer_bound, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_geo):
+    def geoGridcreator(self, utmSRID, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_geo):
         for u in range(1, (geo_number_x+2)):
             for t in range(0, (geo_number_y+2)):
-                symb_cross = self.crossLinegenerator(layer_bound, extentsGeo[0], extentsGeo[1], px, py, u, t, -0.00002145*scale, 0, trLLUTM, linwidth_geo)
+                symb_cross = self.crossLinegenerator(utmSRID, extentsGeo[0], extentsGeo[1], px, py, u, t, -0.00002145*scale, 0, trLLUTM, linwidth_geo)
                 grid_symb.appendSymbolLayer(symb_cross)
         for u in range(0, (geo_number_x+2)):
             for t in range(1, (geo_number_y+2)):
-                symb_cross = self.crossLinegenerator(layer_bound,extentsGeo[0], extentsGeo[1], px, py, u, t, 0, -0.00002145*scale, trLLUTM, linwidth_geo)
+                symb_cross = self.crossLinegenerator(utmSRID,extentsGeo[0], extentsGeo[1], px, py, u, t, 0, -0.00002145*scale, trLLUTM, linwidth_geo)
                 grid_symb.appendSymbolLayer(symb_cross)
         for u in range(0, (geo_number_x+1)):
             for t in range(0, (geo_number_y+2)):
-                symb_cross = self.crossLinegenerator(layer_bound,extentsGeo[0], extentsGeo[1], px, py, u, t, 0.00002145*scale, 0, trLLUTM, linwidth_geo)
+                symb_cross = self.crossLinegenerator(utmSRID,extentsGeo[0], extentsGeo[1], px, py, u, t, 0.00002145*scale, 0, trLLUTM, linwidth_geo)
                 grid_symb.appendSymbolLayer(symb_cross)
         for u in range(0, (geo_number_x+2)):
             for t in range(0, (geo_number_y+1)):
-                symb_cross = self.crossLinegenerator(layer_bound,extentsGeo[0], extentsGeo[1], px, py, u, t, 0, 0.00002145*scale, trLLUTM, linwidth_geo)
+                symb_cross = self.crossLinegenerator(utmSRID,extentsGeo[0], extentsGeo[1], px, py, u, t, 0, 0.00002145*scale, trLLUTM, linwidth_geo)
                 grid_symb.appendSymbolLayer(symb_cross)
         
         return grid_symb
 
-    def geoGridlabelPlacer(self, extentsGeo, px, py, geo_number_x, geo_number_y, dx, dy, fSize, LLfontType, trLLUTM, llcolor, scale):
+    def geoGridlabelPlacer(self, extentsGeo, px, py, geo_number_x, geo_number_y, dx, dy, fSize, LLfontType, trLLUTM, llcolor, scale, layer_bound, trUTMLL):
         root_rule = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
     
         #Upper
         for u in range(0, geo_number_x+2):
             if u ==0:
-                ruletemp = self.grid_labeler(extentsGeo[0], extentsGeo[3], px, py, u, 0, dx[2], dy[0], 'Up '+str(u+1), fSize, LLfontType, str(self.conv_dec_gms(extentsGeo[0], u, 'W', 'E', extentsGeo, True, geo_number_x, geo_number_y))+'+\'. GREENWICH\'', trLLUTM, llcolor)
+                ruletemp = self.grid_labeler(extentsGeo[0], extentsGeo[3], px, py, u, 0, dx[2], dy[0], 'Up '+str(u+1), fSize, LLfontType, str(self.conv_dec_gms(extentsGeo[0], u, 'W', 'E', extentsGeo, True, geo_number_x, geo_number_y))+'+\'. GREENWICH\'', trLLUTM, llcolor, layer_bound, trUTMLL)
                 root_rule.appendChild(ruletemp)
             else:
-                ruletemp = self.grid_labeler(extentsGeo[0], extentsGeo[3], px, py, u, 0, dx[3], dy[0], 'Up '+str(u+1), fSize, LLfontType, self.conv_dec_gms(extentsGeo[0], u, 'W', 'E', extentsGeo, True, geo_number_x, geo_number_y), trLLUTM, llcolor)
+                ruletemp = self.grid_labeler(extentsGeo[0], extentsGeo[3], px, py, u, 0, dx[3], dy[0], 'Up '+str(u+1), fSize, LLfontType, self.conv_dec_gms(extentsGeo[0], u, 'W', 'E', extentsGeo, True, geo_number_x, geo_number_y), trLLUTM, llcolor, layer_bound, trUTMLL)
                 root_rule.appendChild(ruletemp)
         #Bottom
         for b in range(0, geo_number_x+2):
-            ruletemp = self.grid_labeler(extentsGeo[0], extentsGeo[1], px, py, b, 0, dx[3], dy[1], 'Bot '+str(b+1), fSize, LLfontType, self.conv_dec_gms(extentsGeo[0], b, 'W', 'E', extentsGeo, True, geo_number_x, geo_number_y), trLLUTM, llcolor)
+            ruletemp = self.grid_labeler(extentsGeo[0], extentsGeo[1], px, py, b, 0, dx[3], dy[1], 'Bot '+str(b+1), fSize, LLfontType, self.conv_dec_gms(extentsGeo[0], b, 'W', 'E', extentsGeo, True, geo_number_x, geo_number_y), trLLUTM, llcolor, layer_bound, trUTMLL)
             root_rule.appendChild(ruletemp)
         #Right
         for r in range(0, geo_number_y+2):
-            ruletemp = self.grid_labeler(extentsGeo[2], extentsGeo[1], px, py, 0, r, dx[0], dy[2], 'Right '+str(r+1), fSize, LLfontType, self.conv_dec_gms(extentsGeo[1], r, 'S', 'N', extentsGeo, False, geo_number_x, geo_number_y), trLLUTM, llcolor)
+            ruletemp = self.grid_labeler(extentsGeo[2], extentsGeo[1], px, py, 0, r, dx[0], dy[2], 'Right '+str(r+1), fSize, LLfontType, self.conv_dec_gms(extentsGeo[1], r, 'S', 'N', extentsGeo, False, geo_number_x, geo_number_y), trLLUTM, llcolor, layer_bound, trUTMLL)
             root_rule.appendChild(ruletemp)
         #Left
         for l in range(0, geo_number_y+2):
-            ruletemp = self.grid_labeler(extentsGeo[0], extentsGeo[1], px, py, 0, l, dx[1], dy[3], 'Left '+str(l+1), fSize, LLfontType, self.conv_dec_gms(extentsGeo[1], l, 'S', 'N', extentsGeo, False, geo_number_x, geo_number_y), trLLUTM, llcolor)
+            ruletemp = self.grid_labeler(extentsGeo[0], extentsGeo[1], px, py, 0, l, dx[1], dy[3], 'Left '+str(l+1), fSize, LLfontType, self.conv_dec_gms(extentsGeo[1], l, 'S', 'N', extentsGeo, False, geo_number_x, geo_number_y), trLLUTM, llcolor, layer_bound, trUTMLL)
             root_rule.appendChild(ruletemp)
     
         return root_rule
 
-    def utmGridlabelPlacer(self, root_rule, grid_spacing, extentsGeo, extentsUTM, px, py, UTM_num_x, UTM_num_y, trUTMLL, trLLUTM, dx, dy, dy0, dy1, fSize, fontType, scale, geo_bb_or):
+    def utmGridlabelPlacer(self, root_rule, grid_spacing, extentsGeo, extentsUTM, px, py, UTM_num_x, UTM_num_y, trUTMLL, trLLUTM, dx, dy, dy0, dy1, fSize, fontType, scale, geo_bb_or, layer_bound):
         if grid_spacing > 0:
             # Bottom
             ruletest = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
-            ruletest = self.utm_grid_labeler(ruletest, extentsUTM[0], extentsUTM[1], 0, extentsGeo[1], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, 1, True, dx[0], dy[1], dy0[1], 0, 'UTMBotTest', fSize, fontType, grid_spacing, scale, range(1), geo_bb_or)
+            ruletest = self.utm_grid_labeler(ruletest, extentsUTM[0], extentsUTM[1], 0, extentsGeo[1], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, 1, True, dx[0], dy[1], dy0[1], 0, 'UTMBotTest', fSize, fontType, grid_spacing, scale, range(1), geo_bb_or, layer_bound)
             rulechild = ruletest.children()[0]
             if rulechild.settings().fieldName == 'fail':
                 rangeUD = range(2, UTM_num_x+1)
@@ -420,16 +407,16 @@ class GridAndLabelCreator(QObject):
                 rangeUD = range(1, UTM_num_x+1)
 
             for u in rangeUD:
-                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[1], 0, extentsGeo[1], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, True, dx[0], dy[1], dy0[1]+0.4*(scale)*fSize/1.5, 0, 'UTMBot'+str(u), fSize, fontType, grid_spacing, scale, rangeUD, geo_bb_or)
+                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[1], 0, extentsGeo[1], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, True, dx[0], dy[1], dy0[1]+0.4*(scale)*fSize/1.5, 0, 'UTMBot'+str(u), fSize, fontType, grid_spacing, scale, rangeUD, geo_bb_or, layer_bound)
 
             # Upper
             rangeUD = range(1, UTM_num_x+1)
             for u in rangeUD:
-                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[3], 0, extentsGeo[3], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, True, dx[1], dy[0], dy0[0]-1.3*(scale)*fSize/1.5, 0, 'UTMUp'+str(u), fSize, fontType, grid_spacing, scale, rangeUD, geo_bb_or)
+                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[3], 0, extentsGeo[3], extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, True, dx[1], dy[0], dy0[0]-1.3*(scale)*fSize/1.5, 0, 'UTMUp'+str(u), fSize, fontType, grid_spacing, scale, rangeUD, geo_bb_or, layer_bound)
 
             # Left
             ruletest = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
-            ruletest = self.utm_grid_labeler(ruletest, extentsUTM[0], extentsUTM[1], extentsGeo[0], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, 1, False, dx[2], dy[3], dy0[3], dy1[1], 'UTMLeftTest', fSize, fontType, grid_spacing, scale, range(1), geo_bb_or)
+            ruletest = self.utm_grid_labeler(ruletest, extentsUTM[0], extentsUTM[1], extentsGeo[0], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, 1, False, dx[2], dy[3], dy0[3], dy1[1], 'UTMLeftTest', fSize, fontType, grid_spacing, scale, range(1), geo_bb_or, layer_bound)
             rulechild = ruletest.children()[0]
             if rulechild.settings().fieldName == 'fail':
                 rangeLat = range(2, UTM_num_y+1)
@@ -440,16 +427,16 @@ class GridAndLabelCreator(QObject):
                     extra_dist = -3.2*scale*fSize/1.5
                 else:
                     extra_dist = 0
-                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[1], extentsGeo[0], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, False, dx[2]+extra_dist, dy[3], dy0[3], dy1[1], 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, rangeLat, geo_bb_or)
+                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[0], extentsUTM[1], extentsGeo[0], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, False, dx[2]+extra_dist, dy[3], dy0[3], dy1[1], 'UTMLeft'+str(u), fSize, fontType, grid_spacing, scale, rangeLat, geo_bb_or, layer_bound)
             
             # Right
             rangeLat = range(1, UTM_num_y+1)
             for u in rangeLat:
-                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[2], extentsUTM[1], extentsGeo[2], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, False, dx[3], dy[3], dy0[3], dy1[1], 'UTMRight'+str(1), fSize, fontType, grid_spacing, scale, rangeLat, geo_bb_or)
+                root_rule = self.utm_grid_labeler(root_rule, extentsUTM[2], extentsUTM[1], extentsGeo[2], 0, extentsGeo[0], extentsGeo[1], px, py, trUTMLL, trLLUTM, u, False, dx[3], dy[3], dy0[3], dy1[1], 'UTMRight'+str(1), fSize, fontType, grid_spacing, scale, rangeLat, geo_bb_or, layer_bound)
             
         return root_rule
 
-    def styleCreator(self, layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm):
+    def styleCreator(self, feature_geometry, layer_bound, utmSRID, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm):
         """Getting Input Data For Grid Generation"""
         grid_spacing = spacing
         geo_number_x = crossX
@@ -457,21 +444,12 @@ class GridAndLabelCreator(QObject):
         fSize = fontSize
         fontType = font
         LLfontType = fontLL
-
-        #Loading feature
-        layer_bound = layer
-        query = '"'+str(id_attr)+'"='+str(id_value)
-        layer_bound.selectByExpression(query, QgsVectorLayer.SelectBehavior(0))
-        feature_bound = layer_bound.selectedFeatures()[0]
-        layer_bound.removeSelection()
-        projCRS = layer_bound.crs().authid()
-
+		
         #Defining CRSs Transformations
-        trLLUTM = QgsCoordinateTransform(QgsCoordinateReferenceSystem('EPSG:4326'), QgsCoordinateReferenceSystem(projCRS), QgsProject.instance())
-        trUTMLL = QgsCoordinateTransform(QgsCoordinateReferenceSystem(projCRS), QgsCoordinateReferenceSystem('EPSG:4326'), QgsProject.instance())
+        trLLUTM = QgsCoordinateTransform(QgsCoordinateReferenceSystem('EPSG:4326'), QgsCoordinateReferenceSystem('EPSG:' + str(utmSRID)), QgsProject.instance())
+        trUTMLL = QgsCoordinateTransform(QgsCoordinateReferenceSystem('EPSG:' + str(utmSRID)), QgsCoordinateReferenceSystem('EPSG:4326'), QgsProject.instance())
         
         # Transforming to Geographic and defining bounding boxes
-        feature_geometry = feature_bound.geometry()
         feature_bbox = feature_geometry.boundingBox()
         bound_UTM_bb = str(feature_bbox).replace(',','').replace('>','')
         feature_geometry.transform(trUTMLL)
@@ -481,7 +459,7 @@ class GridAndLabelCreator(QObject):
         oriented_geo_bb = str(feature_bbox_or).replace(',','').replace('>','').replace('((','').replace('))','')
 
         #Defining UTM Grid Symbology Type
-        renderer = layer.renderer()
+        renderer = layer_bound.renderer()
         properties = {'color': 'black'}
         grid_symb = QgsFillSymbol.createSimple(properties)
         symb_out = QgsSimpleFillSymbolLayer()
@@ -498,16 +476,16 @@ class GridAndLabelCreator(QObject):
 
             #Generating Vertical Lines
             for x in range(1, UTM_num_x+1):
-                grid_symb= self.utm_Symb_Generator (layer_bound, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, x, 0, extentsGeo, extentsUTM, linwidth_utm)
+                grid_symb= self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, x, 0, extentsGeo, extentsUTM, linwidth_utm)
 
             #Generating Horizontal Lines
             for y in range(1, UTM_num_y+1):
-                grid_symb = self.utm_Symb_Generator (layer_bound, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, 0, y, extentsGeo, extentsUTM, linwidth_utm)
+                grid_symb = self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, 0, y, extentsGeo, extentsUTM, linwidth_utm)
 
         """ Creating Geo Grid """
         px = (round(extentsGeo[2],6) - round(extentsGeo[0],6))/(geo_number_x+1)
         py = (round(extentsGeo[3],6) - round(extentsGeo[1],6))/(geo_number_y+1)
-        grid_symb = self.geoGridcreator(layer_bound, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_geo)
+        grid_symb = self.geoGridcreator(utmSRID, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_geo)
 
         """ Rendering UTM and Geographic Grid """
         #Changing UTM Grid Color
@@ -538,7 +516,7 @@ class GridAndLabelCreator(QObject):
         dy = [1.7, -3.8, -0.8, -0.8]
         dy = [i*scale*fSize/1.5 for i in dy]
 
-        root_rule = self.geoGridlabelPlacer(extentsGeo, px, py, geo_number_x, geo_number_y, dx, dy, fSize, LLfontType, trLLUTM, llcolor, scale)
+        root_rule = self.geoGridlabelPlacer(extentsGeo, px, py, geo_number_x, geo_number_y, dx, dy, fSize, LLfontType, trLLUTM, llcolor, scale, layer_bound, trUTMLL)
 
         """ Labeling UTM Grid"""
         dx = [-2.9, -2.9, -8.9, 2.0]
@@ -550,11 +528,11 @@ class GridAndLabelCreator(QObject):
         dy1 = [2.15, 1.2]
         dy1 = [i*scale*fSize/1.5 for i in dy1]
 
-        root_rule = self.utmGridlabelPlacer(root_rule, grid_spacing, extentsGeo, extentsUTM, px, py, UTM_num_x, UTM_num_y, trUTMLL, trLLUTM, dx, dy, dy0, dy1, fSize, fontType, scale, oriented_geo_bb)
+        root_rule = self.utmGridlabelPlacer(root_rule, grid_spacing, extentsGeo, extentsUTM, px, py, UTM_num_x, UTM_num_y, trUTMLL, trLLUTM, dx, dy, dy0, dy1, fSize, fontType, scale, oriented_geo_bb, layer_bound)
 
         """ Activating Labels """
         rules = QgsRuleBasedLabeling(root_rule)
-        layer.setLabeling(rules)
-        layer.setLabelsEnabled(True)
-        layer.triggerRepaint()
+        layer_bound.setLabeling(rules)
+        layer_bound.setLabelsEnabled(True)
+        layer_bound.triggerRepaint()
         return
