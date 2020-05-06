@@ -85,12 +85,11 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             testFeature = layer.getFeatures('"' + id_attr + '"' + '=' + str(id_value))
             featureList =  [i for i in testFeature]
             if not featureList:
-                QMessageBox.critical(None, u"Erro", u"Escolha um valor existente do atributo '%s'"%(str(id_attr)))
+                QMessageBox.critical(None, u"Erro", u"Escolha um valor existente do atributo de identificação")
                 return            
             else:
                 dialogUTMZoneSelection = UTMZoneSelection(self.iface, layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm)
-                dialogUTMZoneSelection.exec_()
-
+                dialogUTMZoneSelection.setDialog()
     def send_reset(self):
         layer = self.mapLayerSelection.currentLayer()
         self.gridAndLabelCreator.reset(layer)

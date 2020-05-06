@@ -35,9 +35,9 @@ class UTMZoneSelection(QtWidgets.QDialog, FORM_CLASS):
         self.gridAndLabelCreator = GridAndLabelCreator()
         self.setupUi(self)
         self.iface = iface
-        self.setDialog()
         self.okButton.pressed.connect(self.generate_grid)
         self.cancelButton.pressed.connect(self.cancel)
+
 
     def setDialog(self):
         #Unchecking boxes
@@ -77,8 +77,19 @@ class UTMZoneSelection(QtWidgets.QDialog, FORM_CLASS):
             c.setChecked(True) if c.text() in utm else ''
             c.setEnabled(True) if c.text() in utm else ''
 
-        self.generate_grid()
-        self.cancel()
+        zoneChecked = []
+        for c in self.checkList1:
+            zoneChecked.append(c.text()) if c.isChecked() else ''
+        for c in self.checkList2:
+            zoneChecked.append(c.text()) if c.isChecked() else ''
+        for c in self.checkList3:
+            zoneChecked.append(c.text()) if c.isChecked() else ''
+
+        if len(zoneChecked) == 1 or self.workCrs.isGeographic() == False:
+            self.generate_grid()
+        else:
+            self.exec_()
+
 
     def UTMcheck(self, workFeature, workCrs):
         #Opening UTM Zones layer and finding intersections
@@ -140,10 +151,15 @@ class UTMZoneSelection(QtWidgets.QDialog, FORM_CLASS):
         for c in self.checkList3:
             zoneChecked.append(c.text()) if c.isChecked() else ''
 
-        if len(zoneChecked) != 1:
+        if len(zoneChecked) != 1 and self.workCrs.isGeographic() == True:
             QMessageBox.critical(self, u"Erro", u"Selecione apenas um fuso UTM.")
             return
-        else:
+        elif self.workCrs.isGeographic() == False:
+            workFeature_geometry = self.workFeature.geometry()
+            layer_crs_id = self.workCrs.authid().replace('EPSG:','')
+            self.gridAndLabelCreator.styleCreator(workFeature_geometry, self.layer, layer_crs_id, self.id_attr, self.id_value, self.spacing, self.crossX, self.crossY, self.scale, self.color, self.fontSize, self.font, self.fontLL, self.llcolor, self.linwidth_geo, self.linwidth_utm)
+            self.close()
+        elif len(zoneChecked) == 1 and self.workCrs.isGeographic() == True:
             crstr = QgsCoordinateTransform(self.workCrs, QgsCoordinateReferenceSystem(zoneDict[zoneChecked[0]], QgsCoordinateReferenceSystem.EpsgCrsId), QgsProject.instance())
             workFeature_geometry = self.workFeature.geometry()
             workFeature_geometry.transform(crstr)
