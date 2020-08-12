@@ -15,7 +15,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class UTMZoneSelection(QtWidgets.QDialog, FORM_CLASS):
 
-    def __init__(self, iface, layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm):
+    def __init__(self, iface, layer, id_attr, id_value, spacing, crossX, crossY, scale, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm, linwidth_buffer_geo, linwidth_buffer_utm, geo_grid_color, utm_grid_color, geo_grid_buffer_color, utm_grid_buffer_color):
         """Constructor."""
         super(UTMZoneSelection, self).__init__()
         self.layer = layer
@@ -25,13 +25,18 @@ class UTMZoneSelection(QtWidgets.QDialog, FORM_CLASS):
         self.crossX = crossX
         self.crossY = crossY
         self.scale = scale
-        self.color = color
         self.fontSize = fontSize
         self.font = font
         self.fontLL = fontLL
         self.llcolor = llcolor
         self.linwidth_geo = linwidth_geo
         self.linwidth_utm = linwidth_utm
+        self.linwidth_buffer_geo = linwidth_buffer_geo
+        self.linwidth_buffer_utm = linwidth_buffer_utm
+        self.geo_grid_color = geo_grid_color
+        self.utm_grid_color = utm_grid_color
+        self.geo_grid_buffer_color = geo_grid_buffer_color
+        self.utm_grid_buffer_color = utm_grid_buffer_color
         self.gridAndLabelCreator = GridAndLabelCreator()
         self.setupUi(self)
         self.iface = iface
@@ -157,13 +162,13 @@ class UTMZoneSelection(QtWidgets.QDialog, FORM_CLASS):
         elif self.workCrs.isGeographic() == False:
             workFeature_geometry = self.workFeature.geometry()
             layer_crs_id = self.workCrs.authid().replace('EPSG:','')
-            self.gridAndLabelCreator.styleCreator(workFeature_geometry, self.layer, layer_crs_id, self.id_attr, self.id_value, self.spacing, self.crossX, self.crossY, self.scale, self.color, self.fontSize, self.font, self.fontLL, self.llcolor, self.linwidth_geo, self.linwidth_utm)
+            self.gridAndLabelCreator.styleCreator(workFeature_geometry, self.layer, layer_crs_id, self.id_attr, self.id_value, self.spacing, self.crossX, self.crossY, self.scale, self.fontSize, self.font, self.fontLL, self.llcolor, self.linwidth_geo, self.linwidth_utm, self.linwidth_buffer_geo, self.linwidth_buffer_utm, self.geo_grid_color, self.utm_grid_color, self.geo_grid_buffer_color, self.utm_grid_buffer_color)
             self.close()
         elif len(zoneChecked) == 1 and self.workCrs.isGeographic() == True:
             crstr = QgsCoordinateTransform(self.workCrs, QgsCoordinateReferenceSystem(zoneDict[zoneChecked[0]], QgsCoordinateReferenceSystem.EpsgCrsId), QgsProject.instance())
             workFeature_geometry = self.workFeature.geometry()
             workFeature_geometry.transform(crstr)
-            self.gridAndLabelCreator.styleCreator(workFeature_geometry, self.layer, zoneDict[zoneChecked[0]], self.id_attr, self.id_value, self.spacing, self.crossX, self.crossY, self.scale, self.color, self.fontSize, self.font, self.fontLL, self.llcolor, self.linwidth_geo, self.linwidth_utm)
+            self.gridAndLabelCreator.styleCreator(workFeature_geometry, self.layer, zoneDict[zoneChecked[0]], self.id_attr, self.id_value, self.spacing, self.crossX, self.crossY, self.scale, self.fontSize, self.font, self.fontLL, self.llcolor, self.linwidth_geo, self.linwidth_utm, self.linwidth_buffer_geo, self.linwidth_buffer_utm, self.geo_grid_color, self.utm_grid_color, self.geo_grid_buffer_color, self.utm_grid_buffer_color)
             self.close()
 
     def cancel(self):

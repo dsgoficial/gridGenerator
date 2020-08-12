@@ -61,7 +61,7 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     def send_inputs(self):
 
-        if (not self.mapLayerSelection.currentLayer()) and (self.idSelection.currentField()) and (self.idValue.value()) and (self.utmSpacing.value()) and (self.crossesX.value()) and (self.crossesY.value()) and (self.mapScale.value()) and (self.gridColor.color()) and (self.labelFontSize.value()) and (self.fontType.currentFont()) and (self.fontTypeLL.currentFont()) and (self.width_geo.value()) and (self.width_utm.value()):
+        if (not self.mapLayerSelection.currentLayer()) and (self.idSelection.currentField()) and (self.idValue.value()) and (self.utmSpacing.value()) and (self.crossesX.value()) and (self.crossesY.value()) and (self.mapScale.value()) and (self.labelFontSize.value()) and (self.fontType.currentFont()) and (self.fontTypeLL.currentFont()) and (self.width_geo.value()) and (self.width_utm.value()) and (self.width_buffer_geo.value()) and (self.width_buffer_utm.value()):
             return
 
         layer = self.mapLayerSelection.currentLayer()
@@ -71,13 +71,18 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         crossX = self.crossesX.value()
         crossY = self.crossesY.value()
         scale = self.mapScale.value()
-        color = self.gridColor.color()
+        geo_grid_color = self.geo_grid_color.color()
+        utm_grid_color = self.utm_grid_color.color()
+        geo_grid_buffer_color = self.geo_grid_buffer_color.color()
+        utm_grid_buffer_color = self.utm_grid_buffer_color.color()
         fontSize = self.labelFontSize.value()
         font = self.fontType.currentFont()
         fontLL = self.fontTypeLL.currentFont()
         llcolor = self.llColor.color()
         linwidth_geo = self.width_geo.value()
         linwidth_utm = self.width_utm.value()
+        linwidth_buffer_geo = self.width_buffer_geo.value()
+        linwidth_buffer_utm = self.width_buffer_utm.value()
         if layer == None:
             QMessageBox.information(self, u"Aviso", u"Nenhuma camada selecionada.\nSelecione uma camada vetorial poligonal para gerar o grid.")
             return
@@ -88,7 +93,7 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                 QMessageBox.critical(None, u"Erro", u"Escolha um valor existente do atributo de identificação")
                 return            
             else:
-                dialogUTMZoneSelection = UTMZoneSelection(self.iface, layer, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm)
+                dialogUTMZoneSelection = UTMZoneSelection(self.iface, layer, id_attr, id_value, spacing, crossX, crossY, scale, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm, linwidth_buffer_geo, linwidth_buffer_utm, geo_grid_color, utm_grid_color, geo_grid_buffer_color, utm_grid_buffer_color)
                 dialogUTMZoneSelection.setDialog()
     def send_reset(self):
         layer = self.mapLayerSelection.currentLayer()

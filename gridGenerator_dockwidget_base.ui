@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
-    <height>523</height>
+    <width>388</width>
+    <height>668</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,10 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>0</x>
       <y>0</y>
       <width>386</width>
-      <height>491</height>
+      <height>641</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -122,7 +122,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>10</height>
+           <height>15</height>
           </size>
          </property>
          <property name="text">
@@ -259,7 +259,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>10</height>
+           <height>15</height>
           </size>
          </property>
          <property name="text">
@@ -275,7 +275,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>10</height>
+           <height>15</height>
           </size>
          </property>
          <property name="text">
@@ -319,44 +319,9 @@
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="mapScaleLabel">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>10</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Map Scale (Thousands)</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QgsDoubleSpinBox" name="mapScale">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="maximum">
-        <double>999999.000000000000000</double>
-       </property>
-       <property name="value">
-        <double>50.000000000000000</double>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <layout class="QHBoxLayout" name="horizontalLayout_14">
        <item>
-        <widget class="QLabel" name="gridColorLabel">
+        <widget class="QLabel" name="numberCrossesX_3">
          <property name="maximumSize">
           <size>
            <width>16777215</width>
@@ -364,7 +329,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Grid Color</string>
+          <string>Geo Grid Color</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -372,7 +337,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="llColorLabel">
+        <widget class="QLabel" name="numberCrossesY_3">
          <property name="maximumSize">
           <size>
            <width>16777215</width>
@@ -380,7 +345,7 @@
           </size>
          </property>
          <property name="text">
-          <string>LatLong Label Color</string>
+          <string>UTM Grid Color</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -390,9 +355,9 @@
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <layout class="QHBoxLayout" name="horizontalLayout_13">
        <item>
-        <widget class="QgsColorButton" name="gridColor">
+        <widget class="QgsColorButton" name="geo_grid_color">
          <property name="maximumSize">
           <size>
            <width>16777215</width>
@@ -408,7 +373,139 @@
         </widget>
        </item>
        <item>
-        <widget class="QgsColorButton" name="llColor">
+        <widget class="QgsColorButton" name="utm_grid_color">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_15">
+       <item>
+        <widget class="QLabel" name="numberCrossesX_4">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Geo Grid Buffer Symbol Width</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="numberCrossesY_4">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>15</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>UTM Grid Buffer Symbol Width</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_16">
+       <item>
+        <widget class="QgsDoubleSpinBox" name="width_buffer_geo">
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsDoubleSpinBox" name="width_buffer_utm">
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_17">
+       <item>
+        <widget class="QLabel" name="numberCrossesX_5">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Geo Grid Buffer Color</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="numberCrossesY_5">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>UTM Grid Buffer Color</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_18">
+       <item>
+        <widget class="QgsColorButton" name="geo_grid_buffer_color">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="colorDialogTitle">
+          <string>Select Grid Color</string>
+         </property>
+         <property name="allowOpacity">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QgsColorButton" name="utm_grid_buffer_color">
          <property name="maximumSize">
           <size>
            <width>16777215</width>
@@ -488,6 +585,75 @@
          </property>
          <property name="currentText">
           <string>Arial</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QLabel" name="mapScaleLabel">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Map Scale (Thousands)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QgsDoubleSpinBox" name="mapScale">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="maximum">
+        <double>999999.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>50.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="llColorLabel">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>LatLong Label Color</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QgsColorButton" name="llColor">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>20</height>
+          </size>
          </property>
         </widget>
        </item>

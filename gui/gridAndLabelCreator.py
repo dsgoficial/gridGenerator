@@ -30,12 +30,12 @@ class GridAndLabelCreator(QObject):
         layer_rst.triggerRepaint()
         return
 
-    def crossLinegenerator(self, utmSRID, x_geo, y_geo, px, py, u, t, dx, dy, trLLUTM, linwidth_geo):
+    def crossLinegenerator(self, utmSRID, x_geo, y_geo, px, py, u, t, dx, dy, trLLUTM, linwidth_geo, color):
         p1 = QgsPoint(x_geo+px*u, y_geo+py*t)
         p2 = QgsPoint(x_geo+px*u+dx, y_geo+py*t+dy)
         p1.transform(trLLUTM)
         p2.transform(trLLUTM)
-        properties = {'color': 'black'}
+        properties = {'color': color.name()}
         line_temp = QgsLineSymbol.createSimple(properties)
         line_temp.setWidth(linwidth_geo)
         symb = QgsGeometryGeneratorSymbolLayer.create(properties)
@@ -61,9 +61,9 @@ class GridAndLabelCreator(QObject):
         p2.transform(trLLUTM)
         return [a1,a2,p1,p2]
 
-    def utm_Symb_Generator(self, layer_bound, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, t, u, extentsGeo, extentsUTM, linwidth_utm):
+    def utm_Symb_Generator(self, layer_bound, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, t, u, extentsGeo, extentsUTM, linwidth_utm, color):
         test_line = [None]*2
-        properties = {'color': 'black'}
+        properties = {'color': color.name()}
         line_temp = QgsLineSymbol.createSimple(properties)
         line_temp.setWidth(linwidth_utm)
         symb = QgsGeometryGeneratorSymbolLayer.create(properties)
@@ -329,42 +329,39 @@ class GridAndLabelCreator(QObject):
         return root_rule
 
     def conv_dec_gms(self, base_coord, u, neg_character, pos_character, extentsGeo, isVertical, geo_number_x, geo_number_y):
-        if isVertical:
+        if not isVertical:
             coord_spacing = (round(extentsGeo[3],6) - round(extentsGeo[1],6))/(geo_number_y+1)
         else:
             coord_spacing = (round(extentsGeo[2],6) - round(extentsGeo[0],6))/(geo_number_x+1)
         xbase = base_coord + coord_spacing*u
-        if isVertical:
-            x = abs(((round(extentsGeo[3],6) - round(extentsGeo[1],6))/(geo_number_y+1))*round(xbase/((round(extentsGeo[3],6) - round(extentsGeo[1],6))/(geo_number_y+1))))
-        else:
-            x = abs(((round(extentsGeo[2],6) - round(extentsGeo[0],6))/(geo_number_x+1))*round(xbase/((round(extentsGeo[2],6) - round(extentsGeo[0],6))/(geo_number_x+1))))
+        x = round(abs(xbase),6)
         xdeg = int(x)
-        xmin = int(((x - xdeg)*60))
-        xseg = round(((x - xdeg - xmin/60)*3600))
+        xmin = int((round((x - xdeg),6)*60))
+        xseg = round((round((x - xdeg - round((xmin/60),6)),6))*3600)
         if xbase < 0:
             xhem = neg_character
         else:
             xhem = pos_character
         conv_exp_str = u"'{}º {}\\' {}\" {}'".format(str(xdeg).rjust(2,'0'), str(xmin).rjust(2,'0'), str(xseg).rjust(2,'0'), xhem)
-        
+
         return conv_exp_str
 
-    def geoGridcreator(self, utmSRID, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_geo):
+    def geoGridcreator(self, utmSRID, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_geo, color):
         for u in range(1, (geo_number_x+2)):
             for t in range(0, (geo_number_y+2)):
-                symb_cross = self.crossLinegenerator(utmSRID, extentsGeo[0], extentsGeo[1], px, py, u, t, -0.00002145*scale, 0, trLLUTM, linwidth_geo)
+                symb_cross = self.crossLinegenerator(utmSRID, extentsGeo[0], extentsGeo[1], px, py, u, t, -0.00002145*scale, 0, trLLUTM, linwidth_geo, color)
                 grid_symb.appendSymbolLayer(symb_cross)
         for u in range(0, (geo_number_x+2)):
             for t in range(1, (geo_number_y+2)):
-                symb_cross = self.crossLinegenerator(utmSRID,extentsGeo[0], extentsGeo[1], px, py, u, t, 0, -0.00002145*scale, trLLUTM, linwidth_geo)
+                symb_cross = self.crossLinegenerator(utmSRID,extentsGeo[0], extentsGeo[1], px, py, u, t, 0, -0.00002145*scale, trLLUTM, linwidth_geo, color)
                 grid_symb.appendSymbolLayer(symb_cross)
         for u in range(0, (geo_number_x+1)):
             for t in range(0, (geo_number_y+2)):
-                symb_cross = self.crossLinegenerator(utmSRID,extentsGeo[0], extentsGeo[1], px, py, u, t, 0.00002145*scale, 0, trLLUTM, linwidth_geo)
+                symb_cross = self.crossLinegenerator(utmSRID,extentsGeo[0], extentsGeo[1], px, py, u, t, 0.00002145*scale, 0, trLLUTM, linwidth_geo, color)
                 grid_symb.appendSymbolLayer(symb_cross)
         for u in range(0, (geo_number_x+2)):
             for t in range(0, (geo_number_y+1)):
-                symb_cross = self.crossLinegenerator(utmSRID,extentsGeo[0], extentsGeo[1], px, py, u, t, 0, 0.00002145*scale, trLLUTM, linwidth_geo)
+                symb_cross = self.crossLinegenerator(utmSRID,extentsGeo[0], extentsGeo[1], px, py, u, t, 0, 0.00002145*scale, trLLUTM, linwidth_geo, color)
                 grid_symb.appendSymbolLayer(symb_cross)
         
         return grid_symb
@@ -436,8 +433,10 @@ class GridAndLabelCreator(QObject):
             
         return root_rule
 
-    def styleCreator(self, feature_geometry, layer_bound, utmSRID, id_attr, id_value, spacing, crossX, crossY, scale, color, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm):
+    def styleCreator(self, feature_geometry, layer_bound, utmSRID, id_attr, id_value, spacing, crossX, crossY, scale, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm, linwidth_buffer_geo, linwidth_buffer_utm, geo_grid_color, utm_grid_color, geo_grid_buffer_color, utm_grid_buffer_color):
         """Getting Input Data For Grid Generation"""
+        linwidth_buffer_utm = linwidth_buffer_utm + linwidth_utm
+        linwidth_buffer_geo = linwidth_buffer_geo + linwidth_geo
         grid_spacing = spacing
         geo_number_x = crossX
         geo_number_y = crossY
@@ -465,7 +464,7 @@ class GridAndLabelCreator(QObject):
         symb_out = QgsSimpleFillSymbolLayer()
         symb_out.setStrokeColor(QColor('black'))
         symb_out.setFillColor(QColor('white'))
-        symb_out.setStrokeWidth(0.05)
+        symb_out.setStrokeWidth(linwidth_utm)
 
         """ Creating UTM Grid """
         extentsUTM = (float(bound_UTM_bb.split()[1]), float(bound_UTM_bb.split()[2]), float(bound_UTM_bb.split()[3]), float(bound_UTM_bb.split()[4]))
@@ -476,20 +475,25 @@ class GridAndLabelCreator(QObject):
 
             #Generating Vertical Lines
             for x in range(1, UTM_num_x+1):
-                grid_symb= self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, x, 0, extentsGeo, extentsUTM, linwidth_utm)
+                grid_symb= self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, x, 0, extentsGeo, extentsUTM, linwidth_buffer_utm, utm_grid_buffer_color)
+                grid_symb= self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, x, 0, extentsGeo, extentsUTM, linwidth_utm, utm_grid_color)
+
 
             #Generating Horizontal Lines
             for y in range(1, UTM_num_y+1):
-                grid_symb = self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, 0, y, extentsGeo, extentsUTM, linwidth_utm)
+                grid_symb = self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, 0, y, extentsGeo, extentsUTM, linwidth_buffer_utm, utm_grid_buffer_color)
+                grid_symb = self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, 0, y, extentsGeo, extentsUTM, linwidth_utm, utm_grid_color)
+
 
         """ Creating Geo Grid """
         px = (round(extentsGeo[2],6) - round(extentsGeo[0],6))/(geo_number_x+1)
         py = (round(extentsGeo[3],6) - round(extentsGeo[1],6))/(geo_number_y+1)
-        grid_symb = self.geoGridcreator(utmSRID, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_geo)
+        grid_symb = self.geoGridcreator(utmSRID, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_buffer_geo, geo_grid_buffer_color)
+        grid_symb = self.geoGridcreator(utmSRID, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_geo, geo_grid_color)
+
 
         """ Rendering UTM and Geographic Grid """
         #Changing UTM Grid Color
-        grid_symb.setColor(color)
         grid_symb.changeSymbolLayer(0, symb_out)
 
         #Creating Rule Based Renderer (Rule For The Other Features)
