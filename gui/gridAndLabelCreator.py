@@ -473,17 +473,21 @@ class GridAndLabelCreator(QObject):
             UTM_num_x = floor(extentsUTM[2]/grid_spacing) - floor(extentsUTM[0]/grid_spacing)
             UTM_num_y = floor(extentsUTM[3]/grid_spacing) - floor(extentsUTM[1]/grid_spacing)
 
-            #Generating Vertical Lines
+            #Generating Buffer Vertical Lines
             for x in range(1, UTM_num_x+1):
                 grid_symb= self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, x, 0, extentsGeo, extentsUTM, linwidth_buffer_utm, utm_grid_buffer_color)
-                grid_symb= self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, x, 0, extentsGeo, extentsUTM, linwidth_utm, utm_grid_color)
 
+            #Generating Buffer Horizontal Lines
+            for y in range(1, UTM_num_y+1):
+                grid_symb = self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, 0, y, extentsGeo, extentsUTM, linwidth_buffer_utm, utm_grid_buffer_color)
+
+            #Generating Vertical Lines
+            for x in range(1, UTM_num_x+1):
+                grid_symb= self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, x, 0, extentsGeo, extentsUTM, linwidth_utm, utm_grid_color)
 
             #Generating Horizontal Lines
             for y in range(1, UTM_num_y+1):
-                grid_symb = self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, 0, y, extentsGeo, extentsUTM, linwidth_buffer_utm, utm_grid_buffer_color)
                 grid_symb = self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, 0, y, extentsGeo, extentsUTM, linwidth_utm, utm_grid_color)
-
 
         """ Creating Geo Grid """
         px = (round(extentsGeo[2],6) - round(extentsGeo[0],6))/(geo_number_x+1)
