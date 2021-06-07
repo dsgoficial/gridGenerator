@@ -8,7 +8,7 @@
                              -------------------
         begin                : 2019-04-21
         git sha              : $Format:%H$
-        copyright            : (C) 2019 by Joao Felipe Aguiar Guimaraes
+        copyright            : (C) 2021 by Joao Felipe Aguiar Guimaraes
         email                : joao.felipe@eb.mil.br
  ***************************************************************************/
 
@@ -24,14 +24,12 @@
 
 import os
 
-from qgis.PyQt import QtGui, QtWidgets, uic 
-from qgis.PyQt.QtGui import QColor, QFont
+from qgis.PyQt import QtWidgets, uic 
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox, QgsSpinBox, QgsDoubleSpinBox, QgsColorButton
-from qgis.core import QgsVectorLayer, QgsMapLayerProxyModel
+from qgis.PyQt.QtWidgets import QMessageBox
+from qgis.core import QgsMapLayerProxyModel
 from .gui.gridAndLabelCreator import *
 from .gui.utmZoneSelection import *
-
 
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -45,11 +43,6 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def __init__(self, parent=None):
         """Constructor."""
         super(GridGeneratorDockWidget, self).__init__(parent)
-        # Set up the user interface from Designer.
-        # After setupUI you can access any designer object by doing
-        # self.<objectname>, and you can use autoconnect slots - see
-        # http://doc.qt.io/qt-5/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
         self.gridAndLabelCreator = GridAndLabelCreator()
         self.setupUi(self)
         self.iface = iface
@@ -83,6 +76,7 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         linwidth_utm = self.width_utm.value()
         linwidth_buffer_geo = self.width_buffer_geo.value()
         linwidth_buffer_utm = self.width_buffer_utm.value()
+        masks_check = self.maskCheckBox.isChecked()
         if layer == None:
             QMessageBox.information(self, u"Aviso", u"Nenhuma camada selecionada.\nSelecione uma camada vetorial poligonal para gerar o grid.")
             return
@@ -93,7 +87,7 @@ class GridGeneratorDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                 QMessageBox.critical(None, u"Erro", u"Escolha um valor existente do atributo de identificação")
                 return            
             else:
-                dialogUTMZoneSelection = UTMZoneSelection(self.iface, layer, id_attr, id_value, spacing, crossX, crossY, scale, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm, linwidth_buffer_geo, linwidth_buffer_utm, geo_grid_color, utm_grid_color, geo_grid_buffer_color, utm_grid_buffer_color)
+                dialogUTMZoneSelection = UTMZoneSelection(self.iface, layer, id_attr, id_value, spacing, crossX, crossY, scale, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm, linwidth_buffer_geo, linwidth_buffer_utm, geo_grid_color, utm_grid_color, geo_grid_buffer_color, utm_grid_buffer_color, masks_check)
                 dialogUTMZoneSelection.setDialog()
     def send_reset(self):
         layer = self.mapLayerSelection.currentLayer()

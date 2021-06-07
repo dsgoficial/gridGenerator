@@ -1,14 +1,14 @@
 from builtins import str, range, abs, round
-from math import floor, ceil, pow
+from math import floor
 from qgis.core import QgsProject, QgsVectorLayer, QgsCoordinateTransform, QgsCoordinateReferenceSystem, \
                       QgsFillSymbol,QgsLineSymbol, QgsSimpleFillSymbolLayer, QgsSingleSymbolRenderer, \
-                      QgsInvertedPolygonRenderer, QgsRuleBasedRenderer, QgsPoint, QgsPointXY, QgsGeometry, \
-                      QgsGeometryGeneratorSymbolLayer
-from qgis.core import QgsRuleBasedLabeling, QgsPalLayerSettings, QgsTextFormat, QgsPropertyCollection, QgsLabelingResults, QgsLabelPosition
+                      QgsInvertedPolygonRenderer, QgsRuleBasedRenderer, QgsPoint, QgsGeometry, \
+                      QgsGeometryGeneratorSymbolLayer, QgsMapLayer, QgsSymbolLayerReference, QgsSymbolLayerId, \
+                      QgsRenderContext
+from qgis.core import QgsRuleBasedLabeling, QgsPalLayerSettings, QgsTextFormat, QgsPropertyCollection
 from qgis.utils import iface
 from qgis.PyQt.QtGui import QColor, QFont
 from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QMessageBox
 
 
 class GridAndLabelCreator(QObject):
@@ -20,6 +20,7 @@ class GridAndLabelCreator(QObject):
         properties = {'color': 'black'}
         grid_symb = QgsFillSymbol.createSimple(properties)
         symb_out = QgsSimpleFillSymbolLayer()
+        symb_out.setFillColor(QColor('white'))
         grid_symb.changeSymbolLayer(0, symb_out)
         render_base = QgsSingleSymbolRenderer(grid_symb)
         layer_rst.setRenderer(render_base)
@@ -433,10 +434,59 @@ class GridAndLabelCreator(QObject):
             
         return root_rule
 
-    def styleCreator(self, feature_geometry, layer_bound, utmSRID, id_attr, id_value, spacing, crossX, crossY, scale, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm, linwidth_buffer_geo, linwidth_buffer_utm, geo_grid_color, utm_grid_color, geo_grid_buffer_color, utm_grid_buffer_color):
+    def apply_masks(self, layer_bound):
+        layers = iface.mapCanvas().layers()
+        mask_dict = {}
+
+        #Creating symbol layer reference list
+        grid_symbol_ref_list = []
+        renderer = layer_bound.renderer()
+        grid_symbol_rule_id=renderer.rootRule().children()[0].ruleKey()
+        layer_id = layer_bound.id()
+        symbol_list = renderer.symbols(QgsRenderContext())
+        symbol_layer_list = symbol_list[0].symbolLayers()
+        for smb in range(1, len(symbol_layer_list)):
+            idx_list = []
+            idx_list.append(smb)
+            idx_list.append(0)
+            symbol_id = QgsSymbolLayerId(grid_symbol_rule_id, idx_list)
+            temp = QgsSymbolLayerReference(layer_id, symbol_id)
+            grid_symbol_ref_list.append(temp)
+
+        #Listing available label masks
+        for layer in layers:
+            if layer.type() == QgsMapLayer.VectorLayer:
+                labels = layer.labeling()
+                if labels:
+                    label_settings  = labels.settings()
+                    label_format = label_settings.format()
+                    masks = label_format.mask()
+                    if masks.enabled():
+                        mask_dict[layer] = [labels, label_settings, label_format, masks]
+
+        #Applying available lable masks to grid layer symbology
+        for key in mask_dict.keys():
+            old_labels, old_settings, old_format, old_masks = mask_dict[key]
+            mask_symbol_list = old_masks.maskedSymbolLayers()
+            new_symbol_mask = []
+            for item in mask_symbol_list:
+                if not item.layerId() == layer_id:
+                    new_symbol_mask.append(item)
+            for item in grid_symbol_ref_list:
+                new_symbol_mask.append(item)
+            old_masks.setMaskedSymbolLayers(new_symbol_mask)
+            old_format.setMask(old_masks)
+            old_settings.setFormat(old_format)
+            old_labels.setSettings(old_settings)
+            key.setLabeling(old_labels)
+
+        return
+
+
+    def styleCreator(self, feature_geometry, layer_bound, utmSRID, id_attr, id_value, spacing, crossX, crossY, scale, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm, linwidth_buffer_geo, linwidth_buffer_utm, geo_grid_color, utm_grid_color, geo_grid_buffer_color, utm_grid_buffer_color, masks_check):
         """Getting Input Data For Grid Generation"""
-        linwidth_buffer_utm = linwidth_buffer_utm + linwidth_utm
-        linwidth_buffer_geo = linwidth_buffer_geo + linwidth_geo
+        linwidth_buffer_utm += linwidth_utm
+        linwidth_buffer_geo += linwidth_geo
         grid_spacing = spacing
         geo_number_x = crossX
         geo_number_y = crossY
@@ -448,7 +498,7 @@ class GridAndLabelCreator(QObject):
         trLLUTM = QgsCoordinateTransform(QgsCoordinateReferenceSystem('EPSG:4326'), QgsCoordinateReferenceSystem('EPSG:' + str(utmSRID)), QgsProject.instance())
         trUTMLL = QgsCoordinateTransform(QgsCoordinateReferenceSystem('EPSG:' + str(utmSRID)), QgsCoordinateReferenceSystem('EPSG:4326'), QgsProject.instance())
         
-        # Transforming to Geographic and defining bounding boxes
+        #Transforming to Geographic and defining bounding boxes
         feature_bbox = feature_geometry.boundingBox()
         bound_UTM_bb = str(feature_bbox).replace(',','').replace('>','')
         feature_geometry.transform(trUTMLL)
@@ -458,13 +508,9 @@ class GridAndLabelCreator(QObject):
         oriented_geo_bb = str(feature_bbox_or).replace(',','').replace('>','').replace('((','').replace('))','')
 
         #Defining UTM Grid Symbology Type
-        renderer = layer_bound.renderer()
         properties = {'color': 'black'}
         grid_symb = QgsFillSymbol.createSimple(properties)
-        symb_out = QgsSimpleFillSymbolLayer()
-        symb_out.setStrokeColor(QColor('black'))
-        symb_out.setFillColor(QColor('white'))
-        symb_out.setStrokeWidth(linwidth_utm)
+
 
         """ Creating UTM Grid """
         extentsUTM = (float(bound_UTM_bb.split()[1]), float(bound_UTM_bb.split()[2]), float(bound_UTM_bb.split()[3]), float(bound_UTM_bb.split()[4]))
@@ -473,13 +519,14 @@ class GridAndLabelCreator(QObject):
             UTM_num_x = floor(extentsUTM[2]/grid_spacing) - floor(extentsUTM[0]/grid_spacing)
             UTM_num_y = floor(extentsUTM[3]/grid_spacing) - floor(extentsUTM[1]/grid_spacing)
 
-            #Generating Buffer Vertical Lines
-            for x in range(1, UTM_num_x+1):
-                grid_symb= self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, x, 0, extentsGeo, extentsUTM, linwidth_buffer_utm, utm_grid_buffer_color)
+            if linwidth_buffer_utm != linwidth_utm:
+                #Generating Buffer Vertical Lines
+                for x in range(1, UTM_num_x+1):
+                    grid_symb= self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, x, 0, extentsGeo, extentsUTM, linwidth_buffer_utm, utm_grid_buffer_color)
 
-            #Generating Buffer Horizontal Lines
-            for y in range(1, UTM_num_y+1):
-                grid_symb = self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, 0, y, extentsGeo, extentsUTM, linwidth_buffer_utm, utm_grid_buffer_color)
+                #Generating Buffer Horizontal Lines
+                for y in range(1, UTM_num_y+1):
+                    grid_symb = self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, 0, y, extentsGeo, extentsUTM, linwidth_buffer_utm, utm_grid_buffer_color)
 
             #Generating Vertical Lines
             for x in range(1, UTM_num_x+1):
@@ -489,34 +536,61 @@ class GridAndLabelCreator(QObject):
             for y in range(1, UTM_num_y+1):
                 grid_symb = self.utm_Symb_Generator (utmSRID, grid_spacing, trUTMLL, trLLUTM, grid_symb, properties, UTM_num_x, UTM_num_y, 0, y, extentsGeo, extentsUTM, linwidth_utm, utm_grid_color)
 
+
         """ Creating Geo Grid """
         px = (round(extentsGeo[2],6) - round(extentsGeo[0],6))/(geo_number_x+1)
         py = (round(extentsGeo[3],6) - round(extentsGeo[1],6))/(geo_number_y+1)
-        grid_symb = self.geoGridcreator(utmSRID, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_buffer_geo, geo_grid_buffer_color)
+        if linwidth_buffer_geo != linwidth_geo:
+            grid_symb = self.geoGridcreator(utmSRID, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_buffer_geo, geo_grid_buffer_color)
         grid_symb = self.geoGridcreator(utmSRID, grid_symb, extentsGeo, px, py, geo_number_x, geo_number_y, scale, trLLUTM, linwidth_geo, geo_grid_color)
 
 
         """ Rendering UTM and Geographic Grid """
         #Changing UTM Grid Color
-        grid_symb.changeSymbolLayer(0, symb_out)
-
-        #Creating Rule Based Renderer (Rule For The Other Features)
-        properties = {'color': 'white'}
-        ext_grid_symb = QgsFillSymbol.createSimple(properties)
-        symb_ot = QgsRuleBasedRenderer.Rule(ext_grid_symb)
-        symb_ot.setFilterExpression('\"'+str(id_attr)+'\" <> '+str(id_value))
-        symb_ot.setLabel('other')
+        grid_symb.deleteSymbolLayer(0)
 
         #Creating Rule Based Renderer (Rule For The Selected Feature, Root Rule)
         symb_new = QgsRuleBasedRenderer.Rule(grid_symb)
         symb_new.setFilterExpression('\"'+str(id_attr)+'\" = '+str(id_value))
         symb_new.setLabel('layer')
-        symb_new.appendChild(symb_ot)
+        
+        #Appending rules to symbol root rule
+        root_symbol_rule = QgsRuleBasedRenderer.Rule(None)
+        root_symbol_rule.setFilterExpression('')
+        root_symbol_rule.appendChild(symb_new)
 
         #Applying New Renderer
-        render_base = QgsRuleBasedRenderer(symb_new)
-        new_renderer = QgsInvertedPolygonRenderer.convertFromRenderer(render_base)
-        layer_bound.setRenderer(new_renderer)
+        render_base = QgsRuleBasedRenderer(root_symbol_rule)
+        layer_bound.setRenderer(render_base)
+
+
+        """Rendering outside area"""
+        #Duplicating original layer
+        layers_names = [i.name() for i in iface.mapCanvas().layers()]
+        if (layer_bound.name() + "_outside") not in layers_names:
+            outside_bound_layer = QgsVectorLayer(layer_bound.source(), layer_bound.name() + "_outside", layer_bound.providerType())
+            QgsProject.instance().addMapLayer(outside_bound_layer)
+        else:
+            outside_bound_layer = QgsProject.instance().mapLayersByName(layer_bound.name() + "_outside")[0]
+
+        #Creating Rule Based Renderer (Rule For The Other Features)
+        properties = {'color': 'white'}
+        ext_grid_symb = QgsFillSymbol.createSimple(properties)
+        symb_out = QgsSimpleFillSymbolLayer()
+        symb_out.setFillColor(QColor('white'))
+        symb_out.setStrokeWidth(linwidth_utm)
+        ext_grid_symb.changeSymbolLayer(0, symb_out)
+        rule_out = QgsRuleBasedRenderer.Rule(ext_grid_symb)
+        rule_out.setFilterExpression('\"'+str(id_attr)+'\" = '+str(id_value))
+        rule_out.setLabel('outside')
+
+        root_symbol_rule_out = QgsRuleBasedRenderer.Rule(None)
+        root_symbol_rule_out.appendChild(rule_out)
+
+        render_base_out = QgsRuleBasedRenderer(root_symbol_rule_out)
+        new_renderer = QgsInvertedPolygonRenderer.convertFromRenderer(render_base_out)
+        outside_bound_layer.setRenderer(new_renderer)
+
 
         """ Labeling Geo Grid """
         dx = [2.0, -11.0, -8.0, -3.6]
@@ -525,6 +599,7 @@ class GridAndLabelCreator(QObject):
         dy = [i*scale*fSize/1.5 for i in dy]
 
         root_rule = self.geoGridlabelPlacer(extentsGeo, px, py, geo_number_x, geo_number_y, dx, dy, fSize, LLfontType, trLLUTM, llcolor, scale, layer_bound, trUTMLL)
+
 
         """ Labeling UTM Grid"""
         dx = [-2.9, -2.9, -8.9, 2.0]
@@ -538,9 +613,15 @@ class GridAndLabelCreator(QObject):
 
         root_rule = self.utmGridlabelPlacer(root_rule, grid_spacing, extentsGeo, extentsUTM, px, py, UTM_num_x, UTM_num_y, trUTMLL, trLLUTM, dx, dy, dy0, dy1, fSize, fontType, scale, oriented_geo_bb, layer_bound)
 
+
         """ Activating Labels """
         rules = QgsRuleBasedLabeling(root_rule)
         layer_bound.setLabeling(rules)
         layer_bound.setLabelsEnabled(True)
+        
+        if masks_check:
+            self.apply_masks(layer_bound)
+        
         layer_bound.triggerRepaint()
+        
         return

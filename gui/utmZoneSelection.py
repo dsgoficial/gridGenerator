@@ -1,9 +1,6 @@
 import os
-from qgis.PyQt import QtGui, QtWidgets, uic 
-from qgis.PyQt.QtGui import QColor, QFont
-from qgis.PyQt.QtCore import pyqtSignal
-from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox, QgsSpinBox, QgsDoubleSpinBox, QgsColorButton
-from qgis.core import QgsVectorLayer, QgsMapLayerProxyModel, QgsCoordinateTransform, \
+from qgis.PyQt import QtWidgets, uic 
+from qgis.core import QgsVectorLayer, QgsCoordinateTransform, \
                       QgsCoordinateReferenceSystem, QgsProject, QgsGeometry, QgsPointXY, QgsRectangle
 from .gridAndLabelCreator import *
 
@@ -15,7 +12,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class UTMZoneSelection(QtWidgets.QDialog, FORM_CLASS):
 
-    def __init__(self, iface, layer, id_attr, id_value, spacing, crossX, crossY, scale, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm, linwidth_buffer_geo, linwidth_buffer_utm, geo_grid_color, utm_grid_color, geo_grid_buffer_color, utm_grid_buffer_color):
+    def __init__(self, iface, layer, id_attr, id_value, spacing, crossX, crossY, scale, fontSize, font, fontLL, llcolor, linwidth_geo, linwidth_utm, linwidth_buffer_geo, linwidth_buffer_utm, geo_grid_color, utm_grid_color, geo_grid_buffer_color, utm_grid_buffer_color, masks_check):
         """Constructor."""
         super(UTMZoneSelection, self).__init__()
         self.layer = layer
@@ -40,6 +37,7 @@ class UTMZoneSelection(QtWidgets.QDialog, FORM_CLASS):
         self.gridAndLabelCreator = GridAndLabelCreator()
         self.setupUi(self)
         self.iface = iface
+        self.masks = masks_check
         self.okButton.pressed.connect(self.generate_grid)
         self.cancelButton.pressed.connect(self.cancel)
 
@@ -157,18 +155,18 @@ class UTMZoneSelection(QtWidgets.QDialog, FORM_CLASS):
             zoneChecked.append(c.text()) if c.isChecked() else ''
 
         if len(zoneChecked) != 1 and self.workCrs.isGeographic() == True:
-            QMessageBox.critical(self, u"Erro", u"Selecione apenas um fuso UTM.")
+            QtWidgets.QMessageBox.critical(self, u"Erro", u"Selecione apenas um fuso UTM.")
             return
         elif self.workCrs.isGeographic() == False:
             workFeature_geometry = self.workFeature.geometry()
             layer_crs_id = self.workCrs.authid().replace('EPSG:','')
-            self.gridAndLabelCreator.styleCreator(workFeature_geometry, self.layer, layer_crs_id, self.id_attr, self.id_value, self.spacing, self.crossX, self.crossY, self.scale, self.fontSize, self.font, self.fontLL, self.llcolor, self.linwidth_geo, self.linwidth_utm, self.linwidth_buffer_geo, self.linwidth_buffer_utm, self.geo_grid_color, self.utm_grid_color, self.geo_grid_buffer_color, self.utm_grid_buffer_color)
+            self.gridAndLabelCreator.styleCreator(workFeature_geometry, self.layer, layer_crs_id, self.id_attr, self.id_value, self.spacing, self.crossX, self.crossY, self.scale, self.fontSize, self.font, self.fontLL, self.llcolor, self.linwidth_geo, self.linwidth_utm, self.linwidth_buffer_geo, self.linwidth_buffer_utm, self.geo_grid_color, self.utm_grid_color, self.geo_grid_buffer_color, self.utm_grid_buffer_color, self.masks)
             self.close()
         elif len(zoneChecked) == 1 and self.workCrs.isGeographic() == True:
             crstr = QgsCoordinateTransform(self.workCrs, QgsCoordinateReferenceSystem(zoneDict[zoneChecked[0]], QgsCoordinateReferenceSystem.EpsgCrsId), QgsProject.instance())
             workFeature_geometry = self.workFeature.geometry()
             workFeature_geometry.transform(crstr)
-            self.gridAndLabelCreator.styleCreator(workFeature_geometry, self.layer, zoneDict[zoneChecked[0]], self.id_attr, self.id_value, self.spacing, self.crossX, self.crossY, self.scale, self.fontSize, self.font, self.fontLL, self.llcolor, self.linwidth_geo, self.linwidth_utm, self.linwidth_buffer_geo, self.linwidth_buffer_utm, self.geo_grid_color, self.utm_grid_color, self.geo_grid_buffer_color, self.utm_grid_buffer_color)
+            self.gridAndLabelCreator.styleCreator(workFeature_geometry, self.layer, zoneDict[zoneChecked[0]], self.id_attr, self.id_value, self.spacing, self.crossX, self.crossY, self.scale, self.fontSize, self.font, self.fontLL, self.llcolor, self.linwidth_geo, self.linwidth_utm, self.linwidth_buffer_geo, self.linwidth_buffer_utm, self.geo_grid_color, self.utm_grid_color, self.geo_grid_buffer_color, self.utm_grid_buffer_color, self.masks)
             self.close()
 
     def cancel(self):
