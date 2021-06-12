@@ -5,7 +5,7 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsCoordinateTransform, QgsCoo
                       QgsInvertedPolygonRenderer, QgsRuleBasedRenderer, QgsPoint, QgsGeometry, \
                       QgsGeometryGeneratorSymbolLayer, QgsMapLayer, QgsSymbolLayerReference, QgsSymbolLayerId, \
                       QgsRenderContext
-from qgis.core import QgsRuleBasedLabeling, QgsPalLayerSettings, QgsTextFormat, QgsPropertyCollection
+from qgis.core import QgsRuleBasedLabeling, QgsPalLayerSettings, QgsTextFormat, QgsPropertyCollection, QgsVectorLayerSimpleLabeling
 from qgis.utils import iface
 from qgis.PyQt.QtGui import QColor, QFont
 from qgis.PyQt.QtCore import QObject
@@ -455,30 +455,46 @@ class GridAndLabelCreator(QObject):
 
         #Listing available label masks
         for layer in layers:
-            if layer.type() == QgsMapLayer.VectorLayer:
-                labels = layer.labeling()
-                if labels:
-                    label_settings  = labels.settings()
-                    label_format = label_settings.format()
-                    masks = label_format.mask()
-                    if masks.enabled():
-                        mask_dict[layer] = [labels, label_settings, label_format, masks]
+            if not layer.type() == QgsMapLayer.VectorLayer:
+                continue
+            labels = layer.labeling()
+            if not labels:
+                continue
+            providers = []
+            if isinstance(labels, QgsVectorLayerSimpleLabeling):
+                providers.append('--SINGLE--RULE--')
+            if isinstance(labels, QgsRuleBasedLabeling):
+                providers = [x.ruleKey() for x in labels.rootRule().children()]
 
-        #Applying available lable masks to grid layer symbology
-        for key in mask_dict.keys():
-            old_labels, old_settings, old_format, old_masks = mask_dict[key]
-            mask_symbol_list = old_masks.maskedSymbolLayers()
-            new_symbol_mask = []
-            for item in mask_symbol_list:
-                if not item.layerId() == layer_id:
+            for provider in providers:
+                if provider == '--SINGLE--RULE--':
+                    label_settings=labels.settings()
+                else:
+                    label_settings=labels.settings(provider)
+                label_format = label_settings.format()
+                masks = label_format.mask()
+                if not masks.enabled():
+                    continue
+
+                #Applying available lable masks to grid layer symbology
+                mask_symbol_list = masks.maskedSymbolLayers()
+                new_symbol_mask = []
+                for item in mask_symbol_list:
+                    if item.layerId() == layer_id:
+                        continue
                     new_symbol_mask.append(item)
-            for item in grid_symbol_ref_list:
-                new_symbol_mask.append(item)
-            old_masks.setMaskedSymbolLayers(new_symbol_mask)
-            old_format.setMask(old_masks)
-            old_settings.setFormat(old_format)
-            old_labels.setSettings(old_settings)
-            key.setLabeling(old_labels)
+                for item in grid_symbol_ref_list:
+                    new_symbol_mask.append(item)
+
+                masks.setMaskedSymbolLayers(new_symbol_mask)
+                label_format.setMask(masks)
+                label_settings.setFormat(label_format)
+                if provider == '--SINGLE--RULE--':
+                    labels.setSettings(label_settings)
+                else:
+                    labels.setSettings(label_settings, provider)
+            
+            layer.setLabeling(labels)
 
         return
 
