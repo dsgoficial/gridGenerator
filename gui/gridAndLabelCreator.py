@@ -563,12 +563,15 @@ class GridAndLabelCreator(QObject):
         render_base = QgsRuleBasedRenderer(root_symbol_rule)
         layer_bound.setRenderer(render_base)
 
-
         """Rendering outside area"""
         #Duplicating original layer
         layers_names = [i.name() for i in iface.mapCanvas().layers()]
         if (layer_bound.name() + "_outside") not in layers_names:
             outside_bound_layer = QgsVectorLayer(layer_bound.source(), layer_bound.name() + "_outside", layer_bound.providerType())
+            if layer_bound.providerType() == 'memory':
+                feats = [feat for feat in layer_bound.getFeatures()]
+                outside_bound_layer_data = outside_bound_layer.dataProvider()
+                outside_bound_layer_data.addFeatures(feats)
             QgsProject.instance().addMapLayer(outside_bound_layer)
         else:
             outside_bound_layer = QgsProject.instance().mapLayersByName(layer_bound.name() + "_outside")[0]
