@@ -435,7 +435,7 @@ class GridAndLabelCreator(QObject):
         return root_rule
 
     def apply_masks(self, layer_bound):
-        layers = iface.mapCanvas().layers()
+        layers = QgsProject.instance().mapLayers().values()
         mask_dict = {}
 
         #Creating symbol layer reference list
@@ -565,7 +565,7 @@ class GridAndLabelCreator(QObject):
 
         """Rendering outside area"""
         #Duplicating original layer
-        layers_names = [i.name() for i in iface.mapCanvas().layers()]
+        layers_names = [i.name() for i in QgsProject.instance().mapLayers().values()]
         if (layer_bound.name() + "_outside") not in layers_names:
             outside_bound_layer = QgsVectorLayer(layer_bound.source(), layer_bound.name() + "_outside", layer_bound.providerType())
             if layer_bound.providerType() == 'memory':
