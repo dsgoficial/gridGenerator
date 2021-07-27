@@ -5,7 +5,7 @@ from qgis.core import QgsProject, QgsVectorLayer, QgsCoordinateTransform, QgsCoo
                       QgsInvertedPolygonRenderer, QgsRuleBasedRenderer, QgsPoint, QgsGeometry, \
                       QgsGeometryGeneratorSymbolLayer, QgsMapLayer, QgsSymbolLayerReference, QgsSymbolLayerId, \
                       QgsRenderContext
-from qgis.core import QgsRuleBasedLabeling, QgsPalLayerSettings, QgsTextFormat, QgsPropertyCollection, QgsVectorLayerSimpleLabeling
+from qgis.core import QgsRuleBasedLabeling, QgsPalLayerSettings, QgsTextFormat, QgsPropertyCollection, QgsVectorLayerSimpleLabeling, Qgis
 from qgis.utils import iface
 from qgis.PyQt.QtGui import QColor, QFont
 from qgis.PyQt.QtCore import QObject
@@ -40,7 +40,7 @@ class GridAndLabelCreator(QObject):
         line_temp = QgsLineSymbol.createSimple(properties)
         line_temp.setWidth(linwidth_geo)
         symb = QgsGeometryGeneratorSymbolLayer.create(properties)
-        symb.setSymbolType(1)
+        symb.setSymbolType(Qgis.SymbolType.Line)
         symb.setSubSymbol(line_temp)
         
         symb.setGeometryExpression("transform(make_line(make_point({}, {}), make_point({}, {})), 'EPSG:{}', @map_crs)".format(p1.x(), p1.y(), p2.x(), p2.y(), utmSRID))
@@ -68,7 +68,7 @@ class GridAndLabelCreator(QObject):
         line_temp = QgsLineSymbol.createSimple(properties)
         line_temp.setWidth(linwidth_utm)
         symb = QgsGeometryGeneratorSymbolLayer.create(properties)
-        symb.setSymbolType(1)
+        symb.setSymbolType(Qgis.SymbolType.Line)
         symb.setSubSymbol(line_temp)
 
         #Test First And Last Grid Lines
